@@ -8,20 +8,23 @@ class FixOrdenesTrabajoEstado extends Migration
 {
     public function up()
     {
-        // Change 'estado' to VARCHAR to allow 'EN_PROCESO'
-        $fields = [
-            'estado' => [
-                'type' => 'VARCHAR',
-                'constraint' => 50,
-                'null' => false,
-                'default' => 'PENDIENTE',
-            ],
-        ];
-        $this->forge->modifyColumn('ordenes_trabajo', $fields);
+        // Solo modificar si la tabla existe
+        if ($this->db->tableExists('ordenes_trabajo')) {
+            // Change 'estado' to VARCHAR to allow 'EN_PROCESO'
+            $fields = [
+                'estado' => [
+                    'type' => 'VARCHAR',
+                    'constraint' => 50,
+                    'null' => false,
+                    'default' => 'PENDIENTE',
+                ],
+            ];
+            $this->forge->modifyColumn('ordenes_trabajo', $fields);
 
-        // Fix existing empty records
-        $db = \Config\Database::connect();
-        $db->query("UPDATE ordenes_trabajo SET estado = 'EN_PROCESO' WHERE estado = '' OR estado IS NULL");
+            // Fix existing empty records
+            $db = \Config\Database::connect();
+            $db->query("UPDATE ordenes_trabajo SET estado = 'EN_PROCESO' WHERE estado = '' OR estado IS NULL");
+        }
     }
 
     public function down()

@@ -8,8 +8,9 @@ class CreateRampasAndModifyOrdenes extends Migration
 {
     public function up()
     {
-        // 1. Create Rampas Table
-        $this->forge->addField([
+        // 1. Create Rampas Table (si no existe)
+        if (! $this->db->tableExists('rampas')) {
+            $this->forge->addField([
             'id_rampa' => [
                 'type' => 'INT',
                 'constraint' => 5,
@@ -25,9 +26,10 @@ class CreateRampasAndModifyOrdenes extends Migration
                 'constraint' => ['LIBRE', 'OCUPADA'],
                 'default' => 'LIBRE',
             ],
-        ]);
-        $this->forge->addKey('id_rampa', true);
-        $this->forge->createTable('rampas');
+            ]);
+            $this->forge->addKey('id_rampa', true);
+            $this->forge->createTable('rampas');
+        }
 
         // 2. Add id_rampa to ordenes_trabajo
         $fields = [
@@ -39,7 +41,9 @@ class CreateRampasAndModifyOrdenes extends Migration
                 'after' => 'id_empleado_asignado'
             ]
         ];
-        $this->forge->addColumn('ordenes_trabajo', $fields);
+        if ($this->db->tableExists('ordenes_trabajo') && ! $this->db->fieldExists('id_rampa', 'ordenes_trabajo')) {
+            $this->forge->addColumn('ordenes_trabajo', $fields);
+        }
 
         // Optional: Foreign Key
         // $this->forge->addForeignKey('id_rampa', 'rampas', 'id_rampa', 'CASCADE', 'SET NULL');
@@ -48,7 +52,20 @@ class CreateRampasAndModifyOrdenes extends Migration
 
     public function down()
     {
-        $this->forge->dropColumn('ordenes_trabajo', 'id_rampa');
-        $this->forge->dropTable('rampas');
+        if ($this->db->tableExists('ordenes_trabajo')) {
+            // Intentar eliminar la FK antes de eliminar la columna para evitar errores de restricción
+            try {
+                $this->db->query('ALTER TABLE `ordenes_trabajo` DROP FOREIGN KEY `ordenes_trabajo_id_rampa_foreign`');
+            } catch (\Throwable $e) {
+                // Ignorar si la FK no existe
+            }
+
+            if ($this->db->fieldExists('id_rampa', 'ordenes_trabajo')) {
+                $this->forge->dropColumn('ordenes_trabajo', 'id_rampa');
+            }
+        }
+        if ($this->db->tableExists('rampas')) {
+            $this->forge->dropTable('rampas');
+        }
     }
 }

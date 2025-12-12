@@ -8,7 +8,7 @@ use CodeIgniter\Database\Migration;
  * Migración completa de la base de datos del Taller Automotriz
  * Esta migración crea todas las tablas necesarias para el sistema
  */
-class CreateFullDatabase extends Migration
+class CreateFullDatabase_Obsoleta extends Migration
 {
     public function up()
     {
