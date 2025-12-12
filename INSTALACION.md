@@ -20,7 +20,7 @@ git clone <url-del-repositorio>
 
 ### Paso 2: Instalar Dependencias
 ```bash
-cd postgradosg
+cd taller-alfa-romeo
 composer install
 ```
 
@@ -43,6 +43,9 @@ database.default.database = taller_alfa_romeo
 database.default.username = root
 database.default.password = tu_contraseña
 database.default.DBDriver = MySQLi
+database.default.DBPrefix =
+database.default.port = 3306
+app.baseURL = 'http://localhost:8080'
 ```
 
 ### Paso 4: Ejecutar Migraciones (Crear Tablas)
