@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: webdevops/php-nginx:8.1-alpine
+    environment:
+      - PHP_DATE_TIMEZONE=America/Mexico_City
+      - CI_ENVIRONMENT=development
+      - PHP_EXTENSIONS=intl,pdo_pgsql,pgsql
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/app:rw,cached
+    command: php -S 0.0.0.0:80 -t /app/public
+networks:
+  local-network:
+    external: true
