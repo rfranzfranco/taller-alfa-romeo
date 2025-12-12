@@ -9,6 +9,10 @@ class CreateDetalleInsumosOrden extends Migration
     public function up()
     {
         $this->forge->dropTable('detalle_insumos_orden', true);
+        if (! $this->db->tableExists('ordenes_trabajo')) {
+            // Si no existe la tabla referenciada, salimos para evitar error de FK.
+            return;
+        }
         $this->forge->addField([
             'id_detalle_insumo' => [
                 'type' => 'INT',
@@ -45,6 +49,6 @@ class CreateDetalleInsumosOrden extends Migration
 
     public function down()
     {
-        $this->forge->dropTable('detalle_insumos_orden');
+        $this->forge->dropTable('detalle_insumos_orden', true);
     }
 }
