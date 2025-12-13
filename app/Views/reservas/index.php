@@ -144,11 +144,7 @@
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#reservasData').DataTable({
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
-                }
-            });
+            $('#reservasData').DataTable();
         });
     </script>
     <script src="/assets/js/app.js"></script>

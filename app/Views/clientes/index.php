@@ -141,9 +141,6 @@
                 responsive: true,
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
-                },
                 orderCellsTop: true,
                 fixedHeader: true,
                 columnDefs: [

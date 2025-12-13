@@ -114,65 +114,6 @@
                     </a>
                 </li>
 
-            </ul> <a href="ui-colors" class="nav-link" data-key="t-colors">Colors</a>
-            </li>
-            <li class="nav-item">
-                <a href="ui-cards" class="nav-link" data-key="t-cards">Cards</a>
-            </li>
-            <li class="nav-item">
-                <a href="ui-carousel" class="nav-link" data-key="t-carousel">Carousel</a>
-            </li>
-            <li class="nav-item">
-                <a href="ui-dropdowns" class="nav-link" data-key="t-dropdowns">Dropdowns</a>
-            </li>
-            <li class="nav-item">
-                <a href="ui-grid" class="nav-link" data-key="t-grid">Grid</a>
-            </li>
-            </ul>
-        </div>
-        <div class="col-lg-4">
-            <ul class="nav nav-sm flex-column">
-                <li class="nav-item">
-                    <a href="ui-images" class="nav-link" data-key="t-images">Images</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-tabs" class="nav-link" data-key="t-tabs">Tabs</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-accordions" class="nav-link" data-key="t-accordion-collapse">Accordion & Collapse</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-modals" class="nav-link" data-key="t-modals">Modals</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-offcanvas" class="nav-link" data-key="t-offcanvas">Offcanvas</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-placeholders" class="nav-link" data-key="t-placeholders">Placeholders</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-progress" class="nav-link" data-key="t-progress">Progress</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-notifications" class="nav-link" data-key="t-notifications">Notifications</a>
-                </li>
-            </ul>
-        </div>
-        <div class="col-lg-4">
-            <ul class="nav nav-sm flex-column">
-                <li class="nav-item">
-                    <a href="ui-media" class="nav-link" data-key="t-media-object">Media
-                        object</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-embed-video" class="nav-link" data-key="t-embed-video">Embed
-                        Video</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-typography" class="nav-link" data-key="t-typography">Typography</a>
-                </li>
-                <li class="nav-item">
-                    <a href="ui-lists" class="nav-link" data-key="t-lists">Lists</a>
             </ul>
         </div>
         <!-- Sidebar -->
