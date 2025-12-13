@@ -30,10 +30,52 @@ class Usuarios extends ResourceController
      */
     public function show($id = null)
     {
-        // For now, we generally use edit for viewing details in simple CRUDs
-        // Or we can implement a read-only view.
-        // Let's redirect to edit for now or just show same as index
-        return $this->index();
+        $usuario = $this->model->find($id);
+        if (!$usuario) {
+            return redirect()->to('/usuarios')->with('error', 'Usuario no encontrado');
+        }
+
+        $db = \Config\Database::connect();
+        $cliente = null;
+        $empleado = null;
+        $vehiculos = [];
+        $reservas = [];
+        $ordenes = [];
+
+        // Obtener datos adicionales según el rol
+        if ($usuario['rol'] === 'CLIENTE') {
+            $cliente = $db->table('clientes')->where('id_usuario', $id)->get()->getRowArray();
+            if ($cliente) {
+                $vehiculos = $db->table('vehiculos')->where('id_cliente', $cliente['id_cliente'])->get()->getResultArray();
+                $reservas = $db->table('reservas r')
+                    ->select('r.*, v.placa')
+                    ->join('vehiculos v', 'v.id_vehiculo = r.id_vehiculo', 'left')
+                    ->where('r.id_cliente', $cliente['id_cliente'])
+                    ->orderBy('r.fecha_hora_reserva', 'DESC')
+                    ->limit(10)
+                    ->get()->getResultArray();
+            }
+        } elseif ($usuario['rol'] === 'EMPLEADO') {
+            $empleado = $db->table('empleados')->where('id_usuario', $id)->get()->getRowArray();
+            if ($empleado) {
+                $ordenes = $db->table('ordenes_trabajo')
+                    ->where('id_empleado', $empleado['id_empleado'])
+                    ->orderBy('fecha_creacion', 'DESC')
+                    ->limit(10)
+                    ->get()->getResultArray();
+            }
+        }
+
+        $data = [
+            'usuario' => $usuario,
+            'cliente' => $cliente,
+            'empleado' => $empleado,
+            'vehiculos' => $vehiculos,
+            'reservas' => $reservas,
+            'ordenes' => $ordenes,
+            'title' => 'Detalle de Usuario'
+        ];
+        return view('usuarios/show', $data);
     }
 
     /**

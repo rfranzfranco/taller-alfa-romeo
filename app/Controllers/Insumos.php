@@ -56,6 +56,28 @@ class Insumos extends ResourceController
         return redirect()->to('/insumos')->with('message', 'Insumo creado exitosamente');
     }
 
+    public function show($id = null)
+    {
+        $insumo = $this->model->find($id);
+        if (!$insumo) {
+            return redirect()->to('/insumos')->with('error', 'Insumo no encontrado');
+        }
+
+        // Obtener historial de uso en reservas
+        $db = \Config\Database::connect();
+        $historial = $db->table('detalle_reserva')
+            ->where('id_insumo', $id)
+            ->orderBy('id_detalle', 'DESC')
+            ->get()->getResultArray();
+
+        $data = [
+            'insumo' => $insumo,
+            'historial' => $historial,
+            'title' => 'Detalle de Insumo'
+        ];
+        return view('insumos/show', $data);
+    }
+
     public function edit($id = null)
     {
         $insumo = $this->model->find($id);

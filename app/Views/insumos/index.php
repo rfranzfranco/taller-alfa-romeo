@@ -67,21 +67,6 @@
                                                 <th>Estado</th>
                                                 <th>Acciones</th>
                                             </tr>
-                                            <tr>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar código"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar nombre"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar precio"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar stock"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar mínimo"></th>
-                                                <th>
-                                                    <select class="form-select form-select-sm column-filter">
-                                                        <option value="">Todos</option>
-                                                        <option value="Stock Bajo">Stock Bajo</option>
-                                                        <option value="En Stock">En Stock</option>
-                                                    </select>
-                                                </th>
-                                                <th></th>
-                                            </tr>
                                         </thead>
                                         <tbody>
                                             <?php if (!empty($insumos) && is_array($insumos)): ?>
@@ -106,6 +91,9 @@
                                                         </td>
                                                         <td>
                                                             <div class="hstack gap-3 flex-wrap">
+                                                                <a href="/insumos/<?= $insumo['id_insumo'] ?>"
+                                                                    class="link-info fs-15" title="Ver detalles"><i
+                                                                        class="ri-eye-line"></i></a>
                                                                 <a href="/insumos/<?= $insumo['id_insumo'] ?>/edit"
                                                                     class="link-success fs-15" title="Editar"><i
                                                                         class="ri-edit-2-line"></i></a>
@@ -149,19 +137,9 @@
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
                 },
-                orderCellsTop: true,
-                fixedHeader: true,
                 columnDefs: [
                     { orderable: false, targets: -1 }
                 ]
-            });
-
-            $('#insumosTable thead tr:eq(1) th').each(function(i) {
-                $('input, select', this).on('keyup change', function() {
-                    if (table.column(i).search() !== this.value) {
-                        table.column(i).search(this.value).draw();
-                    }
-                });
             });
         });
     </script>

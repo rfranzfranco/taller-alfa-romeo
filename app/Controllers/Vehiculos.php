@@ -55,6 +55,33 @@ class Vehiculos extends ResourceController
         return redirect()->to('/vehiculos')->with('message', 'Vehículo registrado exitosamente');
     }
 
+    public function show($id = null)
+    {
+        $vehiculo = $this->model->find($id);
+        if (!$vehiculo) {
+            return redirect()->to('/vehiculos')->with('error', 'Vehículo no encontrado');
+        }
+
+        // Obtener propietario
+        $clientesModel = new ClientesModel();
+        $cliente = $clientesModel->find($vehiculo['id_cliente']);
+
+        // Obtener historial de reservas
+        $db = \Config\Database::connect();
+        $reservas = $db->table('reservas')
+            ->where('id_vehiculo', $id)
+            ->orderBy('fecha_hora_reserva', 'DESC')
+            ->get()->getResultArray();
+
+        $data = [
+            'vehiculo' => $vehiculo,
+            'cliente' => $cliente,
+            'reservas' => $reservas,
+            'title' => 'Detalle de Vehículo'
+        ];
+        return view('vehiculos/show', $data);
+    }
+
     public function edit($id = null)
     {
         $vehiculo = $this->model->find($id);

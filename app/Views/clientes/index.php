@@ -98,6 +98,9 @@
                                                         <td><?= esc($cliente['correo']) ?></td>
                                                         <td>
                                                             <div class="hstack gap-3 flex-wrap">
+                                                                <a href="/clientes/<?= $cliente['id_cliente'] ?>"
+                                                                    class="link-info fs-15" title="Ver detalles"><i
+                                                                        class="ri-eye-line"></i></a>
                                                                 <a href="/clientes/<?= $cliente['id_cliente'] ?>/edit"
                                                                     class="link-success fs-15" title="Editar"><i
                                                                         class="ri-edit-2-line"></i></a>

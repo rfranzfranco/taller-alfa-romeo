@@ -30,6 +30,35 @@ class Clientes extends ResourceController
         return redirect()->to('/usuarios/new?role=CLIENTE')->with('message', 'Para registrar un nuevo cliente, cree un usuario con rol CLIENTE.');
     }
 
+    public function show($id = null)
+    {
+        $cliente = $this->model->find($id);
+        if (!$cliente) {
+            return redirect()->to('/clientes')->with('error', 'Cliente no encontrado');
+        }
+
+        // Obtener vehículos del cliente
+        $vehiculosModel = new \App\Models\VehiculosModel();
+        $vehiculos = $vehiculosModel->where('id_cliente', $id)->findAll();
+
+        // Obtener reservas del cliente
+        $db = \Config\Database::connect();
+        $reservas = $db->table('reservas r')
+            ->select('r.*, v.placa')
+            ->join('vehiculos v', 'v.id_vehiculo = r.id_vehiculo', 'left')
+            ->where('r.id_cliente', $id)
+            ->orderBy('r.fecha_hora_reserva', 'DESC')
+            ->get()->getResultArray();
+
+        $data = [
+            'cliente' => $cliente,
+            'vehiculos' => $vehiculos,
+            'reservas' => $reservas,
+            'title' => 'Detalle de Cliente'
+        ];
+        return view('clientes/show', $data);
+    }
+
     public function edit($id = null)
     {
         $cliente = $this->model->find($id);
