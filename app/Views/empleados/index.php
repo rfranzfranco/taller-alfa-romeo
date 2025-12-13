@@ -187,15 +187,15 @@
                                                             </td>
                                                             <td>
                                                                 <div class="hstack gap-3 flex-wrap">
-                                                                    <a href="/empleados/<?= $empleado['id_empleado'] ?>/edit" 
-                                                                       class="link-success fs-15" 
-                                                                       title="Editar">
-                                                                        <i class="ri-edit-2-line"></i>
-                                                                    </a>
                                                                     <a href="/empleados/<?= $empleado['id_empleado'] ?>" 
                                                                        class="link-info fs-15"
                                                                        title="Ver Detalles">
                                                                         <i class="ri-eye-line"></i>
+                                                                    </a>
+                                                                    <a href="/empleados/<?= $empleado['id_empleado'] ?>/edit" 
+                                                                       class="link-success fs-15" 
+                                                                       title="Editar">
+                                                                        <i class="ri-edit-2-line"></i>
                                                                     </a>
                                                                     <form action="/empleados/<?= $empleado['id_empleado'] ?>" 
                                                                           method="post" 

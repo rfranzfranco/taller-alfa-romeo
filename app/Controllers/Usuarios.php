@@ -59,8 +59,8 @@ class Usuarios extends ResourceController
             $empleado = $db->table('empleados')->where('id_usuario', $id)->get()->getRowArray();
             if ($empleado) {
                 $ordenes = $db->table('ordenes_trabajo')
-                    ->where('id_empleado', $empleado['id_empleado'])
-                    ->orderBy('fecha_creacion', 'DESC')
+                    ->where('id_empleado_asignado', $empleado['id_empleado'])
+                    ->orderBy('id_orden', 'DESC')
                     ->limit(10)
                     ->get()->getResultArray();
             }
