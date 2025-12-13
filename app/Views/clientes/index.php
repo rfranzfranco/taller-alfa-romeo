@@ -3,6 +3,7 @@
 <head>
     <?php echo view('partials/title-meta', array('title' => $title)); ?>
     <?= $this->include('partials/head-css') ?>
+    <?= $this->include('partials/datatables-css') ?>
 </head>
 
 <body>
@@ -48,7 +49,6 @@
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Lista de Clientes</h4>
                                     <div class="flex-shrink-0">
-                                        <!-- Redirects to User creation with Client role hint -->
                                         <a href="/usuarios/new"
                                             class="btn btn-success btn-label waves-effect waves-light">
                                             <i class="ri-user-add-line label-icon align-middle fs-16 me-2"></i> Nuevo
@@ -57,59 +57,66 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive table-card">
-                                        <table class="table table-hover table-centered align-middle table-nowrap mb-0">
-                                            <thead class="text-muted table-light">
-                                                <tr>
-                                                    <th scope="col">ID</th>
-                                                    <th scope="col">Nombre Completo</th>
-                                                    <th scope="col">CI / NIT</th>
-                                                    <th scope="col">Teléfono</th>
-                                                    <th scope="col">Correo</th>
-                                                    <th scope="col">Acciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php if (!empty($clientes) && is_array($clientes)): ?>
-                                                    <?php foreach ($clientes as $cliente): ?>
-                                                        <tr>
-                                                            <td><a href="#" class="fw-medium">#<?= $cliente['id_cliente'] ?></a>
-                                                            </td>
-                                                            <td>
-                                                                <div class="d-flex align-items-center">
-                                                                    <div class="flex-grow-1">
-                                                                        <?= esc($cliente['nombre_completo']) ?></div>
-                                                                </div>
-                                                            </td>
-                                                            <td><?= esc($cliente['ci_nit']) ?></td>
-                                                            <td><?= esc($cliente['telefono']) ?></td>
-                                                            <td><?= esc($cliente['correo']) ?></td>
-                                                            <td>
-                                                                <div class="hstack gap-3 flex-wrap">
-                                                                    <a href="/clientes/<?= $cliente['id_cliente'] ?>/edit"
-                                                                        class="link-success fs-15"><i
-                                                                            class="ri-edit-2-line"></i></a>
-                                                                    <form action="/clientes/<?= $cliente['id_cliente'] ?>"
-                                                                        method="post" style="display:inline-block;"
-                                                                        onsubmit="return confirm('¿Eliminar registro de cliente? Esto no elimina el usuario de acceso.');">
-                                                                        <input type="hidden" name="_method" value="DELETE">
-                                                                        <button type="submit" class="link-danger fs-15"
-                                                                            style="border:none; background:none; padding:0;"><i
-                                                                                class="ri-delete-bin-line"></i></button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                <?php else: ?>
+                                    <table id="clientesTable" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nombre Completo</th>
+                                                <th>CI / NIT</th>
+                                                <th>Teléfono</th>
+                                                <th>Correo</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                            <tr>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar ID"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar nombre"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar CI/NIT"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar teléfono"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar correo"></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php if (!empty($clientes) && is_array($clientes)): ?>
+                                                <?php foreach ($clientes as $cliente): ?>
                                                     <tr>
-                                                        <td colspan="6" class="text-center">No se encontraron clientes
-                                                            registrados</td>
+                                                        <td><a href="#" class="fw-medium">#<?= $cliente['id_cliente'] ?></a></td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="flex-shrink-0 me-2">
+                                                                    <div class="avatar-xs">
+                                                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                                            <?= strtoupper(substr($cliente['nombre_completo'], 0, 1)) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex-grow-1"><?= esc($cliente['nombre_completo']) ?></div>
+                                                            </div>
+                                                        </td>
+                                                        <td><?= esc($cliente['ci_nit']) ?></td>
+                                                        <td><?= esc($cliente['telefono']) ?></td>
+                                                        <td><?= esc($cliente['correo']) ?></td>
+                                                        <td>
+                                                            <div class="hstack gap-3 flex-wrap">
+                                                                <a href="/clientes/<?= $cliente['id_cliente'] ?>/edit"
+                                                                    class="link-success fs-15" title="Editar"><i
+                                                                        class="ri-edit-2-line"></i></a>
+                                                                <form action="/clientes/<?= $cliente['id_cliente'] ?>"
+                                                                    method="post" style="display:inline-block;"
+                                                                    onsubmit="return confirm('¿Eliminar registro de cliente?');">
+                                                                    <input type="hidden" name="_method" value="DELETE">
+                                                                    <?= csrf_field() ?>
+                                                                    <button type="submit" class="link-danger fs-15"
+                                                                        style="border:none; background:none; padding:0;" title="Eliminar"><i
+                                                                            class="ri-delete-bin-line"></i></button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
                                                     </tr>
-                                                <?php endif; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -123,6 +130,33 @@
 
     <?= $this->include('partials/customizer') ?>
     <?= $this->include('partials/vendor-scripts') ?>
+    <?= $this->include('partials/datatables-scripts') ?>
+    
+    <script>
+        $(document).ready(function() {
+            var table = $('#clientesTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
+                },
+                orderCellsTop: true,
+                fixedHeader: true,
+                columnDefs: [
+                    { orderable: false, targets: -1 }
+                ]
+            });
+
+            $('#clientesTable thead tr:eq(1) th').each(function(i) {
+                $('input', this).on('keyup change', function() {
+                    if (table.column(i).search() !== this.value) {
+                        table.column(i).search(this.value).draw();
+                    }
+                });
+            });
+        });
+    </script>
     <script src="/assets/js/app.js"></script>
 </body>
 

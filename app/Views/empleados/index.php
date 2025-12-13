@@ -3,6 +3,7 @@
 <head>
     <?php echo view('partials/title-meta', array('title' => $title)); ?>
     <?= $this->include('partials/head-css') ?>
+    <?= $this->include('partials/datatables-css') ?>
 </head>
 
 <body>
@@ -114,18 +115,25 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive table-card">
-                                        <table class="table table-hover table-centered align-middle table-nowrap mb-0">
-                                            <thead class="text-muted table-light">
-                                                <tr>
-                                                    <th scope="col">ID</th>
-                                                    <th scope="col">Empleado</th>
-                                                    <th scope="col">Cargo</th>
-                                                    <th scope="col">Especialidad</th>
-                                                    <th scope="col">Fecha Contratación</th>
-                                                    <th scope="col">Acciones</th>
-                                                </tr>
-                                            </thead>
+                                    <table id="empleadosTable" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Empleado</th>
+                                                <th>Cargo</th>
+                                                <th>Especialidad</th>
+                                                <th>Fecha Contratación</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                            <tr>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar ID"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar nombre"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar cargo"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar especialidad"></th>
+                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar fecha"></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
                                             <tbody>
                                                 <?php if (!empty($empleados) && is_array($empleados)): ?>
                                                     <?php foreach ($empleados as $empleado): ?>
@@ -181,13 +189,11 @@
                                                                 <div class="hstack gap-3 flex-wrap">
                                                                     <a href="/empleados/<?= $empleado['id_empleado'] ?>/edit" 
                                                                        class="link-success fs-15" 
-                                                                       data-bs-toggle="tooltip" 
                                                                        title="Editar">
                                                                         <i class="ri-edit-2-line"></i>
                                                                     </a>
                                                                     <a href="/empleados/<?= $empleado['id_empleado'] ?>" 
                                                                        class="link-info fs-15"
-                                                                       data-bs-toggle="tooltip" 
                                                                        title="Ver Detalles">
                                                                         <i class="ri-eye-line"></i>
                                                                     </a>
@@ -200,7 +206,6 @@
                                                                         <button type="submit" 
                                                                                 class="link-danger fs-15" 
                                                                                 style="border:none; background:none; padding:0;"
-                                                                                data-bs-toggle="tooltip" 
                                                                                 title="Eliminar">
                                                                             <i class="ri-delete-bin-line"></i>
                                                                         </button>
@@ -209,22 +214,9 @@
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
-                                                <?php else: ?>
-                                                    <tr>
-                                                        <td colspan="6" class="text-center py-4">
-                                                            <div class="text-muted">
-                                                                <i class="ri-user-unfollow-line fs-1 d-block mb-2"></i>
-                                                                No se encontraron empleados registrados
-                                                            </div>
-                                                            <a href="/empleados/new" class="btn btn-primary btn-sm mt-2">
-                                                                <i class="ri-add-line me-1"></i>Agregar Empleado
-                                                            </a>
-                                                        </td>
-                                                    </tr>
                                                 <?php endif; ?>
                                             </tbody>
                                         </table>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -238,6 +230,33 @@
 
     <?= $this->include('partials/customizer') ?>
     <?= $this->include('partials/vendor-scripts') ?>
+    <?= $this->include('partials/datatables-scripts') ?>
+    
+    <script>
+        $(document).ready(function() {
+            var table = $('#empleadosTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
+                },
+                orderCellsTop: true,
+                fixedHeader: true,
+                columnDefs: [
+                    { orderable: false, targets: -1 }
+                ]
+            });
+
+            $('#empleadosTable thead tr:eq(1) th').each(function(i) {
+                $('input', this).on('keyup change', function() {
+                    if (table.column(i).search() !== this.value) {
+                        table.column(i).search(this.value).draw();
+                    }
+                });
+            });
+        });
+    </script>
     <script src="/assets/js/app.js"></script>
 </body>
 
