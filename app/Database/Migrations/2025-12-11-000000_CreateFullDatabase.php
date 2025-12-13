@@ -156,6 +156,7 @@ class CreateFullDatabase extends Migration
         $this->forge->addKey('id_detalle', true);
         $this->forge->addForeignKey('id_reserva', 'reservas', 'id_reserva', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('id_servicio', 'servicios', 'id_servicio', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('id_insumo', 'insumos', 'id_insumo', 'SET NULL', 'CASCADE');
         $this->forge->createTable('detalle_reserva', true);
 
         // 10. ORDENES_TRABAJO
