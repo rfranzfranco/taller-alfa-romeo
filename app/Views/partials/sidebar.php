@@ -5,19 +5,19 @@
         <!-- Dark Logo-->
         <a href="/" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="/assets/images/logo-sm.png" alt="" height="22">
+                <i class="ri-roadster-fill fs-24 text-primary"></i>
             </span>
             <span class="logo-lg">
-                <img src="/assets/images/logo-dark.png" alt="" height="17">
+                <span class="fw-bold text-dark">TALLER</span> <span class="text-primary fw-bold">ALFA</span>
             </span>
         </a>
         <!-- Light Logo-->
         <a href="/" class="logo logo-light">
             <span class="logo-sm">
-                <img src="/assets/images/logo-sm.png" alt="" height="22">
+                <i class="ri-roadster-fill fs-24 text-white"></i>
             </span>
             <span class="logo-lg">
-                <img src="/assets/images/logo-light.png" alt="" height="17">
+                <span class="fw-bold text-white">TALLER</span> <span style="color: #6ae0bd;" class="fw-bold">ALFA</span>
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
