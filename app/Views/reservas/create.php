@@ -69,10 +69,13 @@
                                             <div class="col-md-6 mb-3">
                                                 <label for="fecha_reserva" class="form-label">Fecha y Hora <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control flatpickr-input"
-                                                    id="fecha_reserva" name="fecha_reserva" data-provider="flatpickr"
-                                                    data-date-format="Y-m-d H:i" data-enable-time="true"
-                                                    placeholder="Seleccione fecha y hora" required>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="ri-calendar-line"></i></span>
+                                                    <input type="text" class="form-control"
+                                                        id="fecha_reserva" name="fecha_reserva"
+                                                        placeholder="Seleccione fecha y hora" readonly required>
+                                                </div>
+                                                <small class="text-muted">Horario de atención: Lun-Sáb 08:00 - 18:00</small>
                                             </div>
                                         </div>
 
@@ -151,7 +154,38 @@
 
     <?= $this->include('partials/vendor-scripts') ?>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
     <script>
+        // Inicializar Flatpickr para el campo de fecha y hora
+        flatpickr("#fecha_reserva", {
+            locale: "es",
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            minDate: "today",
+            minTime: "08:00",
+            maxTime: "18:00",
+            time_24hr: true,
+            disableMobile: false,
+            allowInput: false,
+            clickOpens: true,
+            disable: [
+                function(date) {
+                    // Deshabilitar domingos (0 = domingo)
+                    return (date.getDay() === 0);
+                }
+            ],
+            onChange: function(selectedDates, dateStr, instance) {
+                // Validar que la hora esté dentro del horario de atención
+                if (selectedDates.length > 0) {
+                    const hour = selectedDates[0].getHours();
+                    if (hour < 8 || hour >= 18) {
+                        alert('Por favor seleccione un horario entre 08:00 y 18:00');
+                        instance.clear();
+                    }
+                }
+            }
+        });
+
         function validateServices() {
             const checkboxes = document.querySelectorAll('input[name="servicios[]"]:checked');
             if (checkboxes.length === 0) {
