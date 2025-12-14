@@ -4,112 +4,106 @@
 
 <?= $this->section('content') ?>
 
-<div class="page-content">
-    <div class="container-fluid">
-
-        <!-- Page Title -->
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0"><?= $title ?></h4>
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">Servicios</a></li>
-                            <li class="breadcrumb-item active"><?= $title ?></li>
-                        </ol>
-                    </div>
-                </div>
+<!-- Page Title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0"><?= $title ?></h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Servicios</a></li>
+                    <li class="breadcrumb-item active"><?= $title ?></li>
+                </ol>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Search Form -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title mb-0">Buscar Servicios Realizados</h4>
+<!-- Search Form -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Buscar Servicios Realizados</h4>
+            </div>
+            <div class="card-body">
+                <form action="<?= base_url('historial') ?>" method="get">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <select class="form-select" name="type">
+                                <option value="placa" <?= $type == 'placa' ? 'selected' : '' ?>>Por Placa</option>
+                                <option value="cliente" <?= $type == 'cliente' ? 'selected' : '' ?>>Por Cliente
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="search"
+                                placeholder="Ingrese término de búsqueda..." value="<?= esc($search) ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100"> <i
+                                    class="ri-search-line align-bottom me-1"></i> Buscar</button>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <form action="<?= base_url('historial') ?>" method="get">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <select class="form-select" name="type">
-                                        <option value="placa" <?= $type == 'placa' ? 'selected' : '' ?>>Por Placa</option>
-                                        <option value="cliente" <?= $type == 'cliente' ? 'selected' : '' ?>>Por Cliente
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" name="search"
-                                        placeholder="Ingrese término de búsqueda..." value="<?= esc($search) ?>">
-                                </div>
-                                <div class="col-md-3">
-                                    <button type="submit" class="btn btn-primary w-100"> <i
-                                            class="ri-search-line align-bottom me-1"></i> Buscar</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Results Table -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <?php if (session()->getFlashdata('error')): ?>
-                            <div class="alert alert-danger">
-                                <?= session()->getFlashdata('error') ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if (empty($ordenes)): ?>
-                            <div class="alert alert-warning text-center">
-                                No se encontraron servicios registrados con los criterios de búsqueda.
-                            </div>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th># Orden</th>
-                                            <th>Fecha Servicio</th>
-                                            <th>Cliente</th>
-                                            <th>Vehículo</th>
-                                            <th>Técnico</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($ordenes as $orden): ?>
-                                            <tr>
-                                                <td><?= $orden['id_orden'] ?></td>
-                                                <td><?= date('d/m/Y H:i', strtotime($orden['fecha_fin_real'])) ?></td>
-                                                <td><?= esc($orden['cliente_nombre']) ?></td>
-                                                <td>
-                                                    <span class="badge bg-info"><?= esc($orden['placa']) ?></span><br>
-                                                    <small><?= esc($orden['marca']) ?>         <?= esc($orden['modelo']) ?></small>
-                                                </td>
-                                                <td><?= esc($orden['tecnico_nombre']) ?></td>
-                                                <td>
-                                                    <a href="<?= base_url('historial/' . $orden['id_orden']) ?>"
-                                                        class="btn btn-sm btn-info">
-                                                        <i class="ri-eye-line align-bottom me-1"></i> Ver Detalles
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php endif; ?>
+<!-- Results Table -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <?php if (session()->getFlashdata('error')): ?>
+                    <div class="alert alert-danger">
+                        <?= session()->getFlashdata('error') ?>
                     </div>
-                </div>
+                <?php endif; ?>
+
+                <?php if (empty($ordenes)): ?>
+                    <div class="alert alert-warning text-center">
+                        No se encontraron servicios registrados con los criterios de búsqueda.
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th># Orden</th>
+                                    <th>Fecha Servicio</th>
+                                    <th>Cliente</th>
+                                    <th>Vehículo</th>
+                                    <th>Técnico</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($ordenes as $orden): ?>
+                                    <tr>
+                                        <td><?= $orden['id_orden'] ?></td>
+                                        <td><?= date('d/m/Y H:i', strtotime($orden['fecha_fin_real'])) ?></td>
+                                        <td><?= esc($orden['cliente_nombre']) ?></td>
+                                        <td>
+                                            <span class="badge bg-info"><?= esc($orden['placa']) ?></span><br>
+                                            <small><?= esc($orden['marca']) ?>         <?= esc($orden['modelo']) ?></small>
+                                        </td>
+                                        <td><?= esc($orden['tecnico_nombre']) ?></td>
+                                        <td>
+                                            <a href="<?= base_url('historial/' . $orden['id_orden']) ?>"
+                                                class="btn btn-sm btn-info">
+                                                <i class="ri-eye-line align-bottom me-1"></i> Ver Detalles
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
-
     </div>
 </div>
 

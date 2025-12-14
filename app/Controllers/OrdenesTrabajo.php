@@ -41,6 +41,66 @@ class OrdenesTrabajo extends ResourceController
         return view('ordenestrabajo/index', $data);
     }
 
+    public function show($id = null)
+    {
+        // Obtener la orden con todos los datos relacionados
+        $orden = $this->model->select('ordenes_trabajo.*, 
+            reservas.fecha_reserva, reservas.id_cliente,
+            clientes.nombre_completo as cliente_nombre, clientes.telefono as cliente_telefono, clientes.correo as cliente_correo,
+            vehiculos.placa, vehiculos.marca, vehiculos.modelo, vehiculos.anio, vehiculos.color,
+            empleados.nombre_completo as tecnico_nombre, empleados.cargo as tecnico_cargo,
+            rampas.nombre as rampa_nombre')
+            ->join('reservas', 'reservas.id_reserva = ordenes_trabajo.id_reserva')
+            ->join('clientes', 'clientes.id_cliente = reservas.id_cliente')
+            ->join('vehiculos', 'vehiculos.id_vehiculo = reservas.id_vehiculo')
+            ->join('empleados', 'empleados.id_empleado = ordenes_trabajo.id_empleado_asignado', 'left')
+            ->join('rampas', 'rampas.id_rampa = ordenes_trabajo.id_rampa', 'left')
+            ->find($id);
+
+        if (!$orden) {
+            return redirect()->to('/ordenestrabajo')->with('error', 'Orden de trabajo no encontrada');
+        }
+
+        // Obtener los servicios de la reserva
+        $detalleModel = new DetalleReservaModel();
+        $servicios = $detalleModel->select('detalle_reserva.*, servicios.nombre, servicios.costo_mano_obra, servicios.tiempo_estimado')
+            ->join('servicios', 'servicios.id_servicio = detalle_reserva.id_servicio')
+            ->where('id_reserva', $orden['id_reserva'])
+            ->findAll();
+
+        // Obtener los insumos usados (si la orden está finalizada)
+        $insumosUsados = [];
+        if ($orden['estado'] == 'FINALIZADA') {
+            $detalleInsumosModel = new \App\Models\DetalleInsumosOrdenModel();
+            $insumosUsados = $detalleInsumosModel->select('detalle_insumos_orden.*, insumos.nombre, insumos.unidad_medida')
+                ->join('insumos', 'insumos.id_insumo = detalle_insumos_orden.id_insumo')
+                ->where('id_orden', $id)
+                ->findAll();
+        }
+
+        // Calcular totales
+        $totalServicios = 0;
+        foreach ($servicios as $servicio) {
+            $totalServicios += $servicio['costo_mano_obra'];
+        }
+
+        $totalInsumos = 0;
+        foreach ($insumosUsados as $insumo) {
+            $totalInsumos += $insumo['cantidad'] * $insumo['costo_unitario'];
+        }
+
+        $data = [
+            'orden' => $orden,
+            'servicios' => $servicios,
+            'insumosUsados' => $insumosUsados,
+            'totalServicios' => $totalServicios,
+            'totalInsumos' => $totalInsumos,
+            'title' => 'Detalle de Orden #' . str_pad($id, 4, '0', STR_PAD_LEFT)
+        ];
+
+        return view('ordenestrabajo/show', $data);
+    }
+
     public function assign($id_reserva = null)
     {
         $reservasModel = new ReservasModel();
