@@ -68,15 +68,6 @@
                                                 <th>Color</th>
                                                 <th>Acciones</th>
                                             </tr>
-                                            <tr>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar placa"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar propietario"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar marca"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar modelo"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar año"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar color"></th>
-                                                <th></th>
-                                            </tr>
                                         </thead>
                                         <tbody>
                                             <?php if (!empty($vehiculos) && is_array($vehiculos)): ?>
@@ -140,23 +131,13 @@
     
     <script>
         $(document).ready(function() {
-            var table = $('#vehiculosTable').DataTable({
+            $('#vehiculosTable').DataTable({
                 responsive: true,
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
-                orderCellsTop: true,
-                fixedHeader: true,
                 columnDefs: [
                     { orderable: false, targets: -1 }
                 ]
-            });
-
-            $('#vehiculosTable thead tr:eq(1) th').each(function(i) {
-                $('input', this).on('keyup change', function() {
-                    if (table.column(i).search() !== this.value) {
-                        table.column(i).search(this.value).draw();
-                    }
-                });
             });
         });
     </script>

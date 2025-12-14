@@ -70,7 +70,7 @@ class Vehiculos extends ResourceController
         $db = \Config\Database::connect();
         $reservas = $db->table('reservas')
             ->where('id_vehiculo', $id)
-            ->orderBy('fecha_hora_reserva', 'DESC')
+            ->orderBy('fecha_reserva', 'DESC')
             ->get()->getResultArray();
 
         $data = [

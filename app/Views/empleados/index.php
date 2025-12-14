@@ -118,29 +118,17 @@
                                     <table id="empleadosTable" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>ID</th>
                                                 <th>Empleado</th>
                                                 <th>Cargo</th>
                                                 <th>Especialidad</th>
                                                 <th>Fecha Contratación</th>
                                                 <th>Acciones</th>
                                             </tr>
-                                            <tr>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar ID"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar nombre"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar cargo"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar especialidad"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar fecha"></th>
-                                                <th></th>
-                                            </tr>
                                         </thead>
                                             <tbody>
                                                 <?php if (!empty($empleados) && is_array($empleados)): ?>
                                                     <?php foreach ($empleados as $empleado): ?>
                                                         <tr>
-                                                            <td>
-                                                                <a href="#" class="fw-medium">#<?= $empleado['id_empleado'] ?></a>
-                                                            </td>
                                                             <td>
                                                                 <div class="d-flex align-items-center">
                                                                     <div class="flex-shrink-0 me-2">
@@ -234,23 +222,13 @@
     
     <script>
         $(document).ready(function() {
-            var table = $('#empleadosTable').DataTable({
+            $('#empleadosTable').DataTable({
                 responsive: true,
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
-                orderCellsTop: true,
-                fixedHeader: true,
                 columnDefs: [
                     { orderable: false, targets: -1 }
                 ]
-            });
-
-            $('#empleadosTable thead tr:eq(1) th').each(function(i) {
-                $('input', this).on('keyup change', function() {
-                    if (table.column(i).search() !== this.value) {
-                        table.column(i).search(this.value).draw();
-                    }
-                });
             });
         });
     </script>

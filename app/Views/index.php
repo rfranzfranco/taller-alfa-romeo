@@ -354,6 +354,148 @@
         .animate-card:nth-child(2) { animation-delay: 0.2s; }
         .animate-card:nth-child(3) { animation-delay: 0.3s; }
         .animate-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        /* ========== Dark Mode Styles ========== */
+        [data-bs-theme="dark"] {
+            --primary-blue: #5a7cc9;
+            --primary-dark: #4a6ab8;
+            --bg-dark: #f8f9fa;
+        }
+        
+        [data-bs-theme="dark"] .page-content {
+            background: linear-gradient(135deg, #1a1d21 0%, #212529 100%);
+        }
+        
+        /* Welcome Banner - Dark Mode */
+        [data-bs-theme="dark"] .welcome-banner {
+            background: linear-gradient(135deg, #2c3e6e 0%, #1e2a4a 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        [data-bs-theme="dark"] .welcome-banner h4 {
+            color: #ffffff;
+        }
+        
+        [data-bs-theme="dark"] .welcome-banner p {
+            color: #c9d1dc;
+        }
+        
+        [data-bs-theme="dark"] .current-time {
+            background: rgba(255,255,255,0.1);
+            color: #e0e5f1;
+        }
+        
+        /* Stats Cards - Dark Mode */
+        [data-bs-theme="dark"] .stats-card {
+            background: #212529;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        [data-bs-theme="dark"] .stats-card .stats-number {
+            color: #ced4da;
+        }
+        
+        [data-bs-theme="dark"] .stats-card .stats-label {
+            color: #878a99;
+        }
+        
+        [data-bs-theme="dark"] .stats-card .stats-link {
+            color: #7c93d4;
+        }
+        
+        [data-bs-theme="dark"] .stats-card .stats-link:hover {
+            color: #a0b4e8;
+        }
+        
+        /* Quick Action Buttons - Dark Mode */
+        [data-bs-theme="dark"] .quick-action-btn {
+            background: #212529;
+            border-color: #32383e;
+            color: #a0b4e8;
+        }
+        
+        [data-bs-theme="dark"] .quick-action-btn:hover {
+            background: #405189;
+            border-color: #405189;
+            color: white;
+            box-shadow: 0 5px 15px rgba(64, 81, 137, 0.4);
+        }
+        
+        /* Data Cards - Dark Mode */
+        [data-bs-theme="dark"] .data-card {
+            background: #212529;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        [data-bs-theme="dark"] .data-card .card-header {
+            background: linear-gradient(135deg, #2c3e6e 0%, #1e2a4a 100%);
+        }
+        
+        [data-bs-theme="dark"] .data-card .table thead {
+            background: #292e33;
+        }
+        
+        [data-bs-theme="dark"] .data-card .table thead th {
+            color: #a0b4e8;
+        }
+        
+        [data-bs-theme="dark"] .data-card .table tbody td {
+            border-color: #32383e;
+            color: #ced4da;
+        }
+        
+        [data-bs-theme="dark"] .data-card .table tbody tr:hover {
+            background: rgba(64, 81, 137, 0.1);
+        }
+        
+        /* Badges - Dark Mode */
+        [data-bs-theme="dark"] .badge.bg-light {
+            background: #32383e !important;
+            color: #ced4da !important;
+        }
+        
+        [data-bs-theme="dark"] .badge-status.status-pending {
+            background: rgba(90, 124, 201, 0.2);
+            color: #7c93d4;
+        }
+        
+        [data-bs-theme="dark"] .badge-status.status-confirmed {
+            background: rgba(10, 179, 156, 0.2);
+            color: #2dcdb0;
+        }
+        
+        [data-bs-theme="dark"] .badge-status.status-progress {
+            background: rgba(247, 184, 75, 0.2);
+            color: #f5b94b;
+        }
+        
+        /* Empty State - Dark Mode */
+        [data-bs-theme="dark"] .empty-state {
+            color: #878a99;
+        }
+        
+        [data-bs-theme="dark"] .empty-state i {
+            opacity: 0.4;
+        }
+        
+        /* Table Links - Dark Mode */
+        [data-bs-theme="dark"] .text-primary {
+            color: #7c93d4 !important;
+        }
+        
+        [data-bs-theme="dark"] .fw-medium {
+            color: #ced4da;
+        }
+        
+        [data-bs-theme="dark"] .text-muted {
+            color: #6c757d !important;
+        }
+        
+        /* Avatar - Dark Mode */
+        [data-bs-theme="dark"] .avatar-title.bg-primary-subtle {
+            background: rgba(64, 81, 137, 0.3) !important;
+            color: #a0b4e8 !important;
+        }
     </style>
 
 </head>

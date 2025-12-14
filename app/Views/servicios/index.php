@@ -56,7 +56,6 @@
                                         style="width:100%">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
                                                 <th>Nombre</th>
                                                 <th>Descripción</th>
                                                 <th>Costo Mano de Obra</th>
@@ -67,33 +66,19 @@
                                         <tbody>
                                             <?php foreach ($servicios as $servicio): ?>
                                                 <tr>
-                                                    <td><?= $servicio['id_servicio'] ?></td>
                                                     <td><?= $servicio['nombre'] ?></td>
                                                     <td><?= $servicio['descripcion'] ?? '-' ?></td>
                                                     <td>Bs. <?= number_format($servicio['costo_mano_obra'], 2) ?></td>
                                                     <td><?= $servicio['tiempo_estimado'] ?> min</td>
                                                     <td>
-                                                        <div class="dropdown d-inline-block">
-                                                            <button class="btn btn-soft-secondary btn-sm dropdown"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <i class="ri-more-fill align-middle"></i>
-                                                            </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                                <li><a href="/servicios/<?= $servicio['id_servicio'] ?>/edit"
-                                                                        class="dropdown-item"><i
-                                                                            class="ri-pencil-fill align-bottom me-2 text-muted"></i>
-                                                                        Editar</a></li>
-                                                                <li>
-                                                                    <a href="/servicios/delete/<?= $servicio['id_servicio'] ?>"
-                                                                        class="dropdown-item remove-item-btn"
-                                                                        onclick="return confirm('¿Está seguro de eliminar este elemento?');">
-                                                                        <i
-                                                                            class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
-                                                                        Eliminar
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
+                                                        <div class="hstack gap-3 flex-wrap">
+                                                            <a href="/servicios/<?= $servicio['id_servicio'] ?>/edit"
+                                                                class="link-success fs-15" title="Editar"><i
+                                                                    class="ri-edit-2-line"></i></a>
+                                                            <a href="/servicios/delete/<?= $servicio['id_servicio'] ?>"
+                                                                class="link-danger fs-15" title="Eliminar"
+                                                                onclick="return confirm('¿Está seguro de eliminar este servicio?');"><i
+                                                                    class="ri-delete-bin-line"></i></a>
                                                         </div>
                                                     </td>
                                                 </tr>

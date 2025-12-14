@@ -54,7 +54,6 @@
                                     <table id="reservasData" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
                                                 <th>Fecha Reserva</th>
                                                 <?php if (session()->get('rol') !== 'CLIENTE'): ?>
                                                     <th>Cliente</th>
@@ -67,7 +66,6 @@
                                         <tbody>
                                             <?php foreach ($reservas as $reserva): ?>
                                                 <tr>
-                                                    <td><?= $reserva['id_reserva'] ?></td>
                                                     <td><?= $reserva['fecha_reserva'] ?></td>
                                                     <?php if (session()->get('rol') !== 'CLIENTE'): ?>
                                                         <td><?= $reserva['cliente_nombre'] ?? 'N/A' ?></td>

@@ -59,41 +59,17 @@
                                     <table id="usuariosTable" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>ID</th>
                                                 <th>Nombre de Usuario</th>
                                                 <th>Rol</th>
                                                 <th>Estado</th>
                                                 <th>Fecha Creación</th>
                                                 <th>Acciones</th>
                                             </tr>
-                                            <tr>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar ID"></th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar usuario"></th>
-                                                <th>
-                                                    <select class="form-select form-select-sm column-filter">
-                                                        <option value="">Todos</option>
-                                                        <option value="ADMIN">Admin</option>
-                                                        <option value="RECEPCIONISTA">Recepcionista</option>
-                                                        <option value="EMPLEADO">Empleado</option>
-                                                        <option value="CLIENTE">Cliente</option>
-                                                    </select>
-                                                </th>
-                                                <th>
-                                                    <select class="form-select form-select-sm column-filter">
-                                                        <option value="">Todos</option>
-                                                        <option value="Activo">Activo</option>
-                                                        <option value="Inactivo">Inactivo</option>
-                                                    </select>
-                                                </th>
-                                                <th><input type="text" class="form-control form-control-sm column-filter" placeholder="Buscar fecha"></th>
-                                                <th></th>
-                                            </tr>
                                         </thead>
                                         <tbody>
                                             <?php if (!empty($usuarios) && is_array($usuarios)): ?>
                                                 <?php foreach ($usuarios as $user): ?>
                                                     <tr>
-                                                        <td><a href="#" class="fw-medium">#<?= $user['id_usuario'] ?></a></td>
                                                         <td>
                                                             <div class="d-flex align-items-center">
                                                                 <div class="flex-shrink-0 me-2">
@@ -164,23 +140,13 @@
     
     <script>
         $(document).ready(function() {
-            var table = $('#usuariosTable').DataTable({
+            $('#usuariosTable').DataTable({
                 responsive: true,
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
-                orderCellsTop: true,
-                fixedHeader: true,
                 columnDefs: [
                     { orderable: false, targets: -1 }
                 ]
-            });
-
-            $('#usuariosTable thead tr:eq(1) th').each(function(i) {
-                $('input, select', this).on('keyup change', function() {
-                    if (table.column(i).search() !== this.value) {
-                        table.column(i).search(this.value).draw();
-                    }
-                });
             });
         });
     </script>
