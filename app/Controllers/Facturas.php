@@ -140,4 +140,64 @@ class Facturas extends ResourceController
             return $this->failNotFound('Factura no encontrada para esta orden');
         return $this->respond($factura);
     }
+
+    // RF-09: Vista de factura para imprimir/PDF
+    public function print($id = null)
+    {
+        $db = \Config\Database::connect();
+        
+        // Get invoice data
+        $factura = $this->model->find($id);
+        if (!$factura) {
+            return redirect()->back()->with('error', 'Factura no encontrada');
+        }
+
+        // Get order data
+        $ordenModel = new \App\Models\OrdenesTrabajoModel();
+        $orden = $ordenModel->select('ordenes_trabajo.*, reservas.fecha_reserva, clientes.nombre_completo as cliente_nombre, clientes.telefono, clientes.correo, clientes.direccion, vehiculos.placa, vehiculos.marca, vehiculos.modelo, vehiculos.anio, vehiculos.tipo_motor, vehiculos.color, empleados.nombre_completo as tecnico_nombre')
+            ->join('reservas', 'reservas.id_reserva = ordenes_trabajo.id_reserva')
+            ->join('clientes', 'clientes.id_cliente = reservas.id_cliente')
+            ->join('vehiculos', 'vehiculos.id_vehiculo = reservas.id_vehiculo')
+            ->join('empleados', 'empleados.id_empleado = ordenes_trabajo.id_empleado_asignado')
+            ->where('ordenes_trabajo.id_orden', $factura['id_orden'])
+            ->first();
+
+        // Get services
+        $detalleReservaModel = new \App\Models\DetalleReservaModel();
+        $servicios = $detalleReservaModel->select('servicios.nombre, servicios.costo_mano_obra')
+            ->join('servicios', 'servicios.id_servicio = detalle_reserva.id_servicio')
+            ->where('id_reserva', $orden['id_reserva'])
+            ->findAll();
+
+        // Get supplies/parts
+        $detalleInsumosModel = new \App\Models\DetalleInsumosOrdenModel();
+        $insumos = $detalleInsumosModel->select('detalle_insumos_orden.*, insumos.nombre, insumos.codigo')
+            ->join('insumos', 'insumos.id_insumo = detalle_insumos_orden.id_insumo')
+            ->where('id_orden', $factura['id_orden'])
+            ->findAll();
+
+        // Calculate totals
+        $totalServicios = 0;
+        foreach ($servicios as $servicio) {
+            $totalServicios += $servicio['costo_mano_obra'];
+        }
+
+        $totalInsumos = 0;
+        foreach ($insumos as $insumo) {
+            $totalInsumos += ($insumo['cantidad'] * $insumo['costo_unitario']);
+        }
+
+        $data = [
+            'factura' => $factura,
+            'orden' => $orden,
+            'servicios' => $servicios,
+            'insumos' => $insumos,
+            'totalServicios' => $totalServicios,
+            'totalInsumos' => $totalInsumos,
+            'totalGeneral' => $totalServicios + $totalInsumos,
+            'title' => 'Factura #' . $factura['id_factura']
+        ];
+
+        return view('facturas/print', $data);
+    }
 }

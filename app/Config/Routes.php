@@ -62,6 +62,7 @@ $routes->post('ordenestrabajo/finalize', 'OrdenesTrabajo::finalize');
 // RF-09 & RF-10: Invoices
 $routes->post('facturas/generate/(:num)', 'Facturas::generate/$1'); // parameter is id_orden
 $routes->post('facturas/pay/(:num)', 'Facturas::pay/$1');
+$routes->get('facturas/print/(:num)', 'Facturas::print/$1'); // View/Print invoice
 
 // Standard REST Resources
 $routes->resource('usuarios');

@@ -98,11 +98,14 @@
                                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalRegistrarPago">
                                         <i class="ri-money-dollar-circle-line me-1"></i> Registrar Pago
                                     </button>
+                                    <a href="<?= base_url('facturas/print/' . $factura['id_factura']) ?>" class="btn btn-outline-secondary" target="_blank">
+                                        <i class="ri-eye-line me-1"></i> Ver Factura
+                                    </a>
                                 <?php endif; ?>
                                 <?php if ($factura['estado_pago'] == 'PAGADO'): ?>
-                                    <button type="button" class="btn btn-primary" onclick="generarFacturaPDF(<?= $factura['id_factura'] ?>)">
-                                        <i class="ri-file-pdf-line me-1"></i> Generar Factura PDF
-                                    </button>
+                                    <a href="<?= base_url('facturas/print/' . $factura['id_factura']) ?>" class="btn btn-primary" target="_blank">
+                                        <i class="ri-file-pdf-line me-1"></i> Ver/Imprimir Factura
+                                    </a>
                                 <?php endif; ?>
                             </div>
                         <?php else: ?>
@@ -420,10 +423,5 @@ document.getElementById('formRegistrarPago')?.addEventListener('submit', functio
         submitBtn.innerHTML = '<i class="ri-check-line me-1"></i> Confirmar Pago';
     });
 });
-
-// Generate PDF Invoice
-function generarFacturaPDF(idFactura) {
-    showAlert('info', 'En desarrollo', 'La funcionalidad de generación de PDF está en desarrollo.');
-}
 </script>
 <?= $this->endSection() ?>
