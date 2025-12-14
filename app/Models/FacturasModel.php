@@ -12,7 +12,7 @@ class FacturasModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = ['id_orden', 'fecha_emision', 'monto_total', 'nit_facturacion', 'razon_social', 'estado_pago'];
+    protected $allowedFields = ['id_orden', 'fecha_emision', 'monto_total', 'nit_facturacion', 'razon_social', 'estado_pago', 'metodo_pago', 'fecha_pago', 'monto_pagado'];
 
     protected bool $allowEmptyInserts = false;
 

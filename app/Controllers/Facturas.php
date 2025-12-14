@@ -62,30 +62,29 @@ class Facturas extends ResourceController
             return $this->fail('La factura ya existe para esta orden');
         }
 
-        // Calculate total
-        // 1. Service Cost (from reservation or order? Schema links detail->reserva->sevicio)
-        // Need to traverse: Orden -> Reserva -> DetalleReserva
+        // Get order info
         $ordenModel = new \App\Models\OrdenesTrabajoModel();
         $orden = $ordenModel->find($idOrden);
 
         if (!$orden)
             return $this->failNotFound('Orden no encontrada');
 
-        $builder = $db->table('detalle_reserva dr');
-        $builder->select('dr.precio_unitario_momento, dr.cantidad_insumo, s.costo_mano_obra');
-        $builder->join('servicios s', 's.id_servicio = dr.id_servicio');
-        $builder->where('dr.id_reserva', $orden['id_reserva']);
-        $detalles = $builder->get()->getResultArray();
+        // Calculate total from services (costo_mano_obra)
+        $builderServicios = $db->table('detalle_reserva dr');
+        $builderServicios->selectSum('s.costo_mano_obra', 'total_servicios');
+        $builderServicios->join('servicios s', 's.id_servicio = dr.id_servicio');
+        $builderServicios->where('dr.id_reserva', $orden['id_reserva']);
+        $resultServicios = $builderServicios->get()->getRowArray();
+        $totalServicios = $resultServicios['total_servicios'] ?? 0;
 
-        $total = 0;
-        foreach ($detalles as $det) {
-            // Cost logic: (Insumo unit price * Qty) + Labor Cost? 
-            // The schema has 'precio_unitario_momento' in detalle_reserva. Assuming this is for the insumo.
-            // And labor cost is in services.
-            $insumoCost = $det['precio_unitario_momento'] * $det['cantidad_insumo'];
-            $manoObra = $det['costo_mano_obra'];
-            $total += ($insumoCost + $manoObra);
-        }
+        // Calculate total from supplies/parts (detalle_insumos_orden)
+        $builderInsumos = $db->table('detalle_insumos_orden dio');
+        $builderInsumos->select('SUM(dio.cantidad * dio.costo_unitario) as total_insumos');
+        $builderInsumos->where('dio.id_orden', $idOrden);
+        $resultInsumos = $builderInsumos->get()->getRowArray();
+        $totalInsumos = $resultInsumos['total_insumos'] ?? 0;
+
+        $total = $totalServicios + $totalInsumos;
 
         $facturaData = [
             'id_orden' => $idOrden,
@@ -109,8 +108,36 @@ class Facturas extends ResourceController
         if (!$factura)
             return $this->failNotFound('Factura no encontrada');
 
-        $this->model->update($id, ['estado_pago' => 'PAGADO']);
+        $monto = $this->request->getVar('monto_pagado');
+        $metodoPago = $this->request->getVar('metodo_pago');
+        $fechaPago = $this->request->getVar('fecha_pago');
 
-        return $this->respond(['message' => 'Pago registrado correctamente']);
+        // Validate required fields
+        if (empty($monto) || empty($metodoPago) || empty($fechaPago)) {
+            return $this->fail('Todos los campos son requeridos: monto, método de pago y fecha');
+        }
+
+        $updateData = [
+            'estado_pago' => 'PAGADO',
+            'monto_pagado' => $monto,
+            'metodo_pago' => $metodoPago,
+            'fecha_pago' => $fechaPago
+        ];
+
+        $this->model->update($id, $updateData);
+
+        return $this->respond([
+            'message' => 'Pago registrado correctamente',
+            'factura' => array_merge($factura, $updateData)
+        ]);
+    }
+
+    // Get invoice by order ID
+    public function getByOrden($idOrden = null)
+    {
+        $factura = $this->model->where('id_orden', $idOrden)->first();
+        if (!$factura)
+            return $this->failNotFound('Factura no encontrada para esta orden');
+        return $this->respond($factura);
     }
 }

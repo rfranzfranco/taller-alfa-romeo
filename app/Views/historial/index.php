@@ -76,6 +76,7 @@
                                     <th>Cliente</th>
                                     <th>Vehículo</th>
                                     <th>Técnico</th>
+                                    <th>Estado Pago</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -90,6 +91,17 @@
                                             <small><?= esc($orden['marca']) ?>         <?= esc($orden['modelo']) ?></small>
                                         </td>
                                         <td><?= esc($orden['tecnico_nombre']) ?></td>
+                                        <td>
+                                            <?php if (empty($orden['estado_pago'])): ?>
+                                                <span class="badge bg-secondary-subtle text-secondary">Sin Factura</span>
+                                            <?php elseif ($orden['estado_pago'] == 'PAGADO'): ?>
+                                                <span class="badge bg-success-subtle text-success">PAGADO</span>
+                                            <?php elseif ($orden['estado_pago'] == 'PENDIENTE'): ?>
+                                                <span class="badge bg-warning-subtle text-warning">PENDIENTE</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-danger-subtle text-danger"><?= esc($orden['estado_pago']) ?></span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <a href="<?= base_url('historial/' . $orden['id_orden']) ?>"
                                                 class="btn btn-sm btn-info">

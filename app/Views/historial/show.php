@@ -62,6 +62,59 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Payment & Invoice Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Facturación y Pago</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if ($factura): ?>
+                            <div class="mb-3">
+                                <span class="badge bg-<?= $factura['estado_pago'] == 'PAGADO' ? 'success' : ($factura['estado_pago'] == 'PENDIENTE' ? 'warning' : 'danger') ?>-subtle text-<?= $factura['estado_pago'] == 'PAGADO' ? 'success' : ($factura['estado_pago'] == 'PENDIENTE' ? 'warning' : 'danger') ?> fs-12">
+                                    <?= $factura['estado_pago'] ?>
+                                </span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Factura #:</strong> <?= $factura['id_factura'] ?>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Monto Total:</strong> Bs. <?= number_format($factura['monto_total'], 2) ?>
+                            </div>
+                            <?php if ($factura['estado_pago'] == 'PAGADO'): ?>
+                                <div class="mb-2">
+                                    <strong>Monto Pagado:</strong> Bs. <?= number_format($factura['monto_pagado'] ?? 0, 2) ?>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Método:</strong> <?= esc($factura['metodo_pago'] ?? 'N/A') ?>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Fecha Pago:</strong> <?= $factura['fecha_pago'] ? date('d/m/Y H:i', strtotime($factura['fecha_pago'])) : 'N/A' ?>
+                                </div>
+                            <?php endif; ?>
+                            <hr>
+                            <div class="d-grid gap-2">
+                                <?php if ($factura['estado_pago'] == 'PENDIENTE'): ?>
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalRegistrarPago">
+                                        <i class="ri-money-dollar-circle-line me-1"></i> Registrar Pago
+                                    </button>
+                                <?php endif; ?>
+                                <?php if ($factura['estado_pago'] == 'PAGADO'): ?>
+                                    <button type="button" class="btn btn-primary" onclick="generarFacturaPDF(<?= $factura['id_factura'] ?>)">
+                                        <i class="ri-file-pdf-line me-1"></i> Generar Factura PDF
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted mb-3">No se ha generado factura para este servicio.</p>
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalGenerarFactura">
+                                    <i class="ri-file-list-3-line me-1"></i> Generar Factura
+                                </button>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
 
             <!-- Service Details -->
@@ -166,7 +219,7 @@
                                                 <th class="fw-bold">Total General :</th>
                                                 <td class="text-end">
                                                     <span class="fw-bold text-success fs-16">Bs.
-                                                        <?= number_format($totalServicios + $totalInsumos, 2) ?></span>
+                                                        <?= number_format($totalGeneral, 2) ?></span>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -183,4 +236,194 @@
     </div>
 </div>
 
+<!-- Modal Generar Factura -->
+<div class="modal fade" id="modalGenerarFactura" tabindex="-1" aria-labelledby="modalGenerarFacturaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalGenerarFacturaLabel">Generar Factura</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formGenerarFactura">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nit" class="form-label">NIT Facturación</label>
+                        <input type="text" class="form-control" id="nit" name="nit" placeholder="Ingrese NIT o 0 para S/N">
+                    </div>
+                    <div class="mb-3">
+                        <label for="razon_social" class="form-label">Razón Social</label>
+                        <input type="text" class="form-control" id="razon_social" name="razon_social" placeholder="Nombre o razón social">
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>Monto Total:</strong> Bs. <?= number_format($totalGeneral, 2) ?>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Generar Factura</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Registrar Pago -->
+<?php if ($factura && $factura['estado_pago'] == 'PENDIENTE'): ?>
+<div class="modal fade" id="modalRegistrarPago" tabindex="-1" aria-labelledby="modalRegistrarPagoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRegistrarPagoLabel">Registrar Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formRegistrarPago">
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3">
+                        <strong>Factura #:</strong> <?= $factura['id_factura'] ?><br>
+                        <strong>Monto a Pagar:</strong> Bs. <?= number_format($factura['monto_total'], 2) ?>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto_pagado" class="form-label">Monto Pagado <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">Bs.</span>
+                            <input type="number" step="0.01" class="form-control" id="monto_pagado" name="monto_pagado" 
+                                   value="<?= $factura['monto_total'] ?>" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="metodo_pago" class="form-label">Método de Pago <span class="text-danger">*</span></label>
+                        <select class="form-select" id="metodo_pago" name="metodo_pago" required>
+                            <option value="">Seleccione un método</option>
+                            <option value="EFECTIVO">Efectivo</option>
+                            <option value="TRANSFERENCIA">Transferencia Bancaria</option>
+                            <option value="TARJETA">Tarjeta de Crédito/Débito</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_pago" class="form-label">Fecha de Pago <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="fecha_pago" name="fecha_pago" 
+                               value="<?= date('Y-m-d\TH:i') ?>" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="ri-check-line me-1"></i> Confirmar Pago
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+const idOrden = <?= $orden['id_orden'] ?>;
+<?php if ($factura): ?>
+const idFactura = <?= $factura['id_factura'] ?>;
+<?php else: ?>
+let idFactura = null;
+<?php endif; ?>
+
+// Helper function to show alerts
+function showAlert(type, title, message, callback) {
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        <strong>${title}</strong><br>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+        if (callback) callback();
+    }, 2000);
+}
+
+// Generate Invoice
+document.getElementById('formGenerarFactura')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Generando...';
+    
+    fetch('<?= base_url('facturas/generate/') ?>' + idOrden, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalGenerarFactura'));
+        modal.hide();
+        
+        if (data.id_factura) {
+            showAlert('success', '¡Factura Generada!', 'La factura #' + data.id_factura + ' ha sido creada exitosamente.', () => {
+                location.reload();
+            });
+        } else {
+            showAlert('error', 'Error', data.messages?.error || 'No se pudo generar la factura');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Generar Factura';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('error', 'Error', 'Ocurrió un error al generar la factura');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Generar Factura';
+    });
+});
+
+// Register Payment
+document.getElementById('formRegistrarPago')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
+    
+    fetch('<?= base_url('facturas/pay/') ?>' + idFactura, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalRegistrarPago'));
+        modal.hide();
+        
+        if (data.message && data.message.includes('correctamente')) {
+            showAlert('success', '¡Pago Registrado!', 'El pago ha sido registrado exitosamente.', () => {
+                location.reload();
+            });
+        } else {
+            showAlert('error', 'Error', data.messages?.error || 'No se pudo registrar el pago');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="ri-check-line me-1"></i> Confirmar Pago';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('error', 'Error', 'Ocurrió un error al registrar el pago');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="ri-check-line me-1"></i> Confirmar Pago';
+    });
+});
+
+// Generate PDF Invoice
+function generarFacturaPDF(idFactura) {
+    showAlert('info', 'En desarrollo', 'La funcionalidad de generación de PDF está en desarrollo.');
+}
+</script>
 <?= $this->endSection() ?>
