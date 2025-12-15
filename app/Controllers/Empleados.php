@@ -18,8 +18,19 @@ class Empleados extends BaseController
         $this->usuariosModel = new UsuariosModel();
     }
 
+    private function requireAdmin()
+    {
+        if (session()->get('rol') !== 'ADMIN') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder a la gestión de personal.');
+        }
+        return null;
+    }
+
     public function index()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
         $data = [
             'title' => 'Gestión de Personal',
             'empleados' => $this->empleadosModel->findAll()
@@ -29,6 +40,10 @@ class Empleados extends BaseController
 
     public function show($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $empleado = $this->empleadosModel->find($id);
         
         if (!$empleado) {
@@ -49,6 +64,10 @@ class Empleados extends BaseController
 
     public function new()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         // Obtener usuarios que pueden ser empleados (rol EMPLEADO o RECEPCIONISTA)
         $usuarios = $this->usuariosModel
             ->whereIn('rol', ['EMPLEADO', 'RECEPCIONISTA', 'ADMIN'])
@@ -64,6 +83,10 @@ class Empleados extends BaseController
 
     public function create()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $rules = [
             'id_usuario' => 'required|numeric',
             'nombre_completo' => 'required|min_length[3]|max_length[100]',
@@ -91,6 +114,10 @@ class Empleados extends BaseController
 
     public function edit($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $empleado = $this->empleadosModel->find($id);
         
         if (!$empleado) {
@@ -106,6 +133,10 @@ class Empleados extends BaseController
 
     public function update($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $empleado = $this->empleadosModel->find($id);
         
         if (!$empleado) {
@@ -137,6 +168,10 @@ class Empleados extends BaseController
 
     public function delete($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $empleado = $this->empleadosModel->find($id);
         
         if (!$empleado) {

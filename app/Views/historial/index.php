@@ -29,6 +29,7 @@
             <div class="card-body">
                 <form action="<?= base_url('historial') ?>" method="get">
                     <div class="row g-3">
+                        <?php if (empty($isCliente)): ?>
                         <div class="col-md-3">
                             <select class="form-select" name="type">
                                 <option value="placa" <?= $type == 'placa' ? 'selected' : '' ?>>Por Placa</option>
@@ -44,6 +45,17 @@
                             <button type="submit" class="btn btn-primary w-100"> <i
                                     class="ri-search-line align-bottom me-1"></i> Buscar</button>
                         </div>
+                        <?php else: ?>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="search"
+                                placeholder="Buscar por placa..." value="<?= esc($search) ?>">
+                            <input type="hidden" name="type" value="placa">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100"> <i
+                                    class="ri-search-line align-bottom me-1"></i> Buscar</button>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>
@@ -73,7 +85,9 @@
                                 <tr>
                                     <th># Orden</th>
                                     <th>Fecha Servicio</th>
+                                    <?php if (empty($isCliente)): ?>
                                     <th>Cliente</th>
+                                    <?php endif; ?>
                                     <th>Vehículo</th>
                                     <th>Técnico</th>
                                     <th>Estado Pago</th>
@@ -85,7 +99,9 @@
                                     <tr>
                                         <td><?= $orden['id_orden'] ?></td>
                                         <td><?= date('d/m/Y H:i', strtotime($orden['fecha_fin_real'])) ?></td>
+                                        <?php if (empty($isCliente)): ?>
                                         <td><?= esc($orden['cliente_nombre']) ?></td>
+                                        <?php endif; ?>
                                         <td>
                                             <span class="badge bg-info"><?= esc($orden['placa']) ?></span><br>
                                             <small><?= esc($orden['marca']) ?>         <?= esc($orden['modelo']) ?></small>

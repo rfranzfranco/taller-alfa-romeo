@@ -10,28 +10,86 @@ class Vehiculos extends ResourceController
     protected $modelName = 'App\Models\VehiculosModel';
     protected $format = 'html';
 
+    // Helper para obtener id_cliente del usuario actual si es CLIENTE
+    private function getClienteIdForCurrentUser()
+    {
+        if (session()->get('rol') === 'CLIENTE') {
+            $userId = session()->get('id_usuario');
+            $clientesModel = new ClientesModel();
+            $cliente = $clientesModel->where('id_usuario', $userId)->first();
+            return $cliente ? $cliente['id_cliente'] : null;
+        }
+        return null;
+    }
+
     public function index()
     {
-        // Ideally we join with Clientes to show Owner Name
-        $data['vehiculos'] = $this->model->select('vehiculos.*, clients.nombre_completo as nombre_cliente')
-            ->join('clientes as clients', 'clients.id_cliente = vehiculos.id_cliente')
-            ->findAll();
-        $data['title'] = 'Gestión de Vehículos';
+        $role = session()->get('rol');
+
+        if ($role === 'CLIENTE') {
+            $clienteId = $this->getClienteIdForCurrentUser();
+            if (!$clienteId) {
+                return redirect()->to('/')->with('error', 'No se encontró su perfil de cliente.');
+            }
+            $data['vehiculos'] = $this->model->select('vehiculos.*, clients.nombre_completo as nombre_cliente')
+                ->join('clientes as clients', 'clients.id_cliente = vehiculos.id_cliente')
+                ->where('vehiculos.id_cliente', $clienteId)
+                ->findAll();
+            $data['title'] = 'Mis Vehículos';
+            $data['isCliente'] = true;
+        } else {
+            $data['vehiculos'] = $this->model->select('vehiculos.*, clients.nombre_completo as nombre_cliente')
+                ->join('clientes as clients', 'clients.id_cliente = vehiculos.id_cliente')
+                ->findAll();
+            $data['title'] = 'Gestión de Vehículos';
+            $data['isCliente'] = false;
+        }
+
         return view('vehiculos/index', $data);
     }
 
     public function new()
     {
+        $role = session()->get('rol');
         $clientesModel = new ClientesModel();
-        $data = [
-            'clientes' => $clientesModel->findAll(),
-            'title' => 'Registrar Vehículo'
-        ];
+
+        if ($role === 'CLIENTE') {
+            $clienteId = $this->getClienteIdForCurrentUser();
+            if (!$clienteId) {
+                return redirect()->to('/vehiculos')->with('error', 'No se encontró su perfil de cliente.');
+            }
+            $cliente = $clientesModel->find($clienteId);
+            $data = [
+                'clientes' => [$cliente],
+                'clienteId' => $clienteId,
+                'title' => 'Registrar Mi Vehículo',
+                'isCliente' => true
+            ];
+        } else {
+            $data = [
+                'clientes' => $clientesModel->findAll(),
+                'clienteId' => null,
+                'title' => 'Registrar Vehículo',
+                'isCliente' => false
+            ];
+        }
+
         return view('vehiculos/create', $data);
     }
 
     public function create()
     {
+        $role = session()->get('rol');
+
+        if ($role === 'CLIENTE') {
+            $clienteId = $this->getClienteIdForCurrentUser();
+            if (!$clienteId) {
+                return redirect()->to('/vehiculos')->with('error', 'No se encontró su perfil de cliente.');
+            }
+            // Forzar que el vehículo se registre a su propio cliente
+            $_POST['id_cliente'] = $clienteId;
+        }
+
         $rules = [
             'id_cliente' => 'required|integer',
             'placa' => 'required|is_unique[vehiculos.placa]|min_length[5]',
@@ -62,6 +120,14 @@ class Vehiculos extends ResourceController
             return redirect()->to('/vehiculos')->with('error', 'Vehículo no encontrado');
         }
 
+        // Verificar que el cliente sea propietario
+        if (session()->get('rol') === 'CLIENTE') {
+            $clienteId = $this->getClienteIdForCurrentUser();
+            if ($vehiculo['id_cliente'] != $clienteId) {
+                return redirect()->to('/vehiculos')->with('error', 'No tiene permiso para ver este vehículo.');
+            }
+        }
+
         // Obtener propietario
         $clientesModel = new ClientesModel();
         $cliente = $clientesModel->find($vehiculo['id_cliente']);
@@ -89,12 +155,29 @@ class Vehiculos extends ResourceController
             return redirect()->to('/vehiculos')->with('error', 'Vehículo no encontrado');
         }
 
+        $role = session()->get('rol');
         $clientesModel = new ClientesModel();
-        $data = [
-            'vehiculo' => $vehiculo,
-            'clientes' => $clientesModel->findAll(), // In case owner is changed
-            'title' => 'Editar Vehículo'
-        ];
+
+        if ($role === 'CLIENTE') {
+            $clienteId = $this->getClienteIdForCurrentUser();
+            if ($vehiculo['id_cliente'] != $clienteId) {
+                return redirect()->to('/vehiculos')->with('error', 'No tiene permiso para editar este vehículo.');
+            }
+            $cliente = $clientesModel->find($clienteId);
+            $data = [
+                'vehiculo' => $vehiculo,
+                'clientes' => [$cliente],
+                'title' => 'Editar Mi Vehículo',
+                'isCliente' => true
+            ];
+        } else {
+            $data = [
+                'vehiculo' => $vehiculo,
+                'clientes' => $clientesModel->findAll(), // In case owner is changed
+                'title' => 'Editar Vehículo',
+                'isCliente' => false
+            ];
+        }
         return view('vehiculos/edit', $data);
     }
 
@@ -103,6 +186,16 @@ class Vehiculos extends ResourceController
         $vehiculo = $this->model->find($id);
         if (!$vehiculo) {
             return redirect()->to('/vehiculos')->with('error', 'Vehículo no encontrado');
+        }
+
+        $role = session()->get('rol');
+        if ($role === 'CLIENTE') {
+            $clienteId = $this->getClienteIdForCurrentUser();
+            if ($vehiculo['id_cliente'] != $clienteId) {
+                return redirect()->to('/vehiculos')->with('error', 'No tiene permiso para editar este vehículo.');
+            }
+            // Forzar propietario al mismo cliente
+            $_POST['id_cliente'] = $clienteId;
         }
 
         $rules = [
@@ -130,6 +223,18 @@ class Vehiculos extends ResourceController
 
     public function delete($id = null)
     {
+        $vehiculo = $this->model->find($id);
+        if (!$vehiculo) {
+            return redirect()->to('/vehiculos')->with('error', 'Vehículo no encontrado');
+        }
+
+        if (session()->get('rol') === 'CLIENTE') {
+            $clienteId = $this->getClienteIdForCurrentUser();
+            if ($vehiculo['id_cliente'] != $clienteId) {
+                return redirect()->to('/vehiculos')->with('error', 'No tiene permiso para eliminar este vehículo.');
+            }
+        }
+
         if ($this->model->delete($id)) {
             return redirect()->to('/vehiculos')->with('message', 'Vehículo eliminado exitosamente');
         }

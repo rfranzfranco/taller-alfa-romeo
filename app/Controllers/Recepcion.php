@@ -11,8 +11,20 @@ use App\Models\OrdenesTrabajoModel; // If we want to auto-create order? Requirem
 
 class Recepcion extends BaseController
 {
+    private function requireStaff()
+    {
+        $role = session()->get('rol');
+        if ($role !== 'ADMIN' && $role !== 'EMPLEADO') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder a recepción de vehículos.');
+        }
+        return null;
+    }
+
     public function index()
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
         $vehiculosModel = new VehiculosModel();
         $serviciosModel = new ServiciosModel();
 
@@ -34,6 +46,10 @@ class Recepcion extends BaseController
 
     public function store()
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $rules = [
             'id_vehiculo' => 'required|integer',
             'servicios' => 'required'

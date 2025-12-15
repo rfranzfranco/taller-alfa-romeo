@@ -74,6 +74,7 @@
                                         <input type="hidden" name="_method" value="PUT">
                                         <?= csrf_field() ?>
                                         <div class="row g-3">
+                                            <?php if (empty($isCliente)): ?>
                                             <div class="col-lg-12">
                                                 <div class="mb-3">
                                                     <label for="id_cliente" class="form-label">Propietario
@@ -91,6 +92,9 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <?php else: ?>
+                                            <input type="hidden" name="id_cliente" value="<?= $vehiculo['id_cliente'] ?>">
+                                            <?php endif; ?>
 
                                             <div class="col-lg-4">
                                                 <div class="form-floating">

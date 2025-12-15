@@ -10,13 +10,29 @@ class Facturas extends ResourceController
     protected $modelName = 'App\Models\FacturasModel';
     protected $format = 'json';
 
+    private function requireStaff()
+    {
+        $role = session()->get('rol');
+        if ($role !== 'ADMIN' && $role !== 'EMPLEADO') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder a facturación.');
+        }
+        return null;
+    }
+
     public function index()
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
         return $this->respond($this->model->findAll());
     }
 
     public function show($id = null)
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $data = $this->model->find($id);
         if (!$data)
             return $this->failNotFound('No Data Found with id ' . $id);
@@ -25,6 +41,10 @@ class Facturas extends ResourceController
 
     public function create()
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $data = $this->request->getPost();
         if (!$this->model->save($data)) {
             return $this->fail($this->model->errors());
@@ -34,6 +54,10 @@ class Facturas extends ResourceController
 
     public function update($id = null)
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $data = $this->request->getRawInput();
         if (!$this->model->update($id, $data)) {
             return $this->fail($this->model->errors());
@@ -43,6 +67,10 @@ class Facturas extends ResourceController
 
     public function delete($id = null)
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $data = $this->model->find($id);
         if ($data) {
             $this->model->delete($id);
@@ -54,6 +82,10 @@ class Facturas extends ResourceController
     // RF-09: Generación de facturas
     public function generate($idOrden = null)
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $db = \Config\Database::connect();
 
         // Check if invoice already exists
@@ -104,6 +136,10 @@ class Facturas extends ResourceController
     // RF-10: Registro de pagos
     public function pay($id = null)
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $factura = $this->model->find($id);
         if (!$factura)
             return $this->failNotFound('Factura no encontrada');
@@ -135,6 +171,10 @@ class Facturas extends ResourceController
     // Get invoice by order ID
     public function getByOrden($idOrden = null)
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $factura = $this->model->where('id_orden', $idOrden)->first();
         if (!$factura)
             return $this->failNotFound('Factura no encontrada para esta orden');
@@ -145,6 +185,7 @@ class Facturas extends ResourceController
     public function print($id = null)
     {
         $db = \Config\Database::connect();
+        $role = session()->get('rol');
         
         // Get invoice data
         $factura = $this->model->find($id);
@@ -154,13 +195,29 @@ class Facturas extends ResourceController
 
         // Get order data
         $ordenModel = new \App\Models\OrdenesTrabajoModel();
-        $orden = $ordenModel->select('ordenes_trabajo.*, reservas.fecha_reserva, clientes.nombre_completo as cliente_nombre, clientes.telefono, clientes.correo, clientes.direccion, vehiculos.placa, vehiculos.marca, vehiculos.modelo, vehiculos.anio, vehiculos.tipo_motor, vehiculos.color, empleados.nombre_completo as tecnico_nombre')
+        $orden = $ordenModel->select('ordenes_trabajo.*, reservas.fecha_reserva, reservas.id_cliente, clientes.nombre_completo as cliente_nombre, clientes.telefono, clientes.correo, clientes.direccion, vehiculos.placa, vehiculos.marca, vehiculos.modelo, vehiculos.anio, vehiculos.tipo_motor, vehiculos.color, empleados.nombre_completo as tecnico_nombre')
             ->join('reservas', 'reservas.id_reserva = ordenes_trabajo.id_reserva')
             ->join('clientes', 'clientes.id_cliente = reservas.id_cliente')
             ->join('vehiculos', 'vehiculos.id_vehiculo = reservas.id_vehiculo')
             ->join('empleados', 'empleados.id_empleado = ordenes_trabajo.id_empleado_asignado')
             ->where('ordenes_trabajo.id_orden', $factura['id_orden'])
             ->first();
+
+        // Verificar permisos para CLIENTE - solo puede ver facturas de sus propios servicios pagados
+        if ($role === 'CLIENTE') {
+            $userId = session()->get('id_usuario');
+            $clientesModel = new \App\Models\ClientesModel();
+            $cliente = $clientesModel->where('id_usuario', $userId)->first();
+            
+            if (!$cliente || $orden['id_cliente'] != $cliente['id_cliente']) {
+                return redirect()->to('/historial')->with('error', 'No tiene permiso para ver esta factura.');
+            }
+            
+            // Solo facturas pagadas
+            if ($factura['estado_pago'] !== 'PAGADO') {
+                return redirect()->to('/historial')->with('error', 'Solo puede ver facturas de servicios pagados.');
+            }
+        }
 
         // Get services
         $detalleReservaModel = new \App\Models\DetalleReservaModel();

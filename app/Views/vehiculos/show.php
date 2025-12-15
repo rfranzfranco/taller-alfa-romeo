@@ -153,7 +153,7 @@
                                                             <td><a href="/reservas/<?= $reserva['id_reserva'] ?>" class="fw-medium">#<?= $reserva['id_reserva'] ?></a></td>
                                                             <td>
                                                                 <i class="ri-calendar-line me-1 text-muted"></i>
-                                                                <?= date('d/m/Y', strtotime($reserva['fecha_hora_reserva'])) ?>
+                                                                <?= date('d/m/Y', strtotime($reserva['fecha_reserva'])) ?>
                                                             </td>
                                                             <td>
                                                                 <?php 

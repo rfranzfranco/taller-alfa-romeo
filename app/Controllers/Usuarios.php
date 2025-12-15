@@ -9,6 +9,15 @@ class Usuarios extends ResourceController
     protected $modelName = 'App\Models\UsuariosModel';
     protected $format = 'html'; // Changed to html for view return
 
+    // Solo ADMIN puede gestionar usuarios
+    private function requireAdmin()
+    {
+        if (session()->get('rol') !== 'ADMIN') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder a usuarios.');
+        }
+        return null;
+    }
+
     /**
      * Return an array of resource objects, themselves in array format
      *
@@ -16,6 +25,9 @@ class Usuarios extends ResourceController
      */
     public function index()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
         $data = [
             'usuarios' => $this->model->findAll(),
             'title' => 'Gestión de Usuarios'
@@ -30,6 +42,10 @@ class Usuarios extends ResourceController
      */
     public function show($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $usuario = $this->model->find($id);
         if (!$usuario) {
             return redirect()->to('/usuarios')->with('error', 'Usuario no encontrado');
@@ -85,6 +101,10 @@ class Usuarios extends ResourceController
      */
     public function new()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $data = [
             'title' => 'Nuevo Usuario'
         ];
@@ -98,6 +118,10 @@ class Usuarios extends ResourceController
      */
     public function create()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $db = \Config\Database::connect();
 
         // Base user rules - Fixed min_length syntax (square brackets)
@@ -188,6 +212,10 @@ class Usuarios extends ResourceController
      */
     public function edit($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $usuario = $this->model->find($id);
         if (!$usuario) {
             return redirect()->to('/usuarios')->with('error', 'Usuario no encontrado');
@@ -207,6 +235,10 @@ class Usuarios extends ResourceController
      */
     public function update($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $usuario = $this->model->find($id);
         if (!$usuario) {
             return redirect()->to('/usuarios')->with('error', 'Usuario no encontrado');
@@ -256,6 +288,10 @@ class Usuarios extends ResourceController
      */
     public function delete($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         if ($this->model->delete($id)) {
             return redirect()->to('/usuarios')->with('message', 'Usuario eliminado exitosamente');
         }

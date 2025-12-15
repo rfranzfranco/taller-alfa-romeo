@@ -61,7 +61,9 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Placa</th>
+                                                <?php if (empty($isCliente)): ?>
                                                 <th>Propietario</th>
+                                                <?php endif; ?>
                                                 <th>Marca</th>
                                                 <th>Modelo</th>
                                                 <th>Año</th>
@@ -74,6 +76,7 @@
                                                 <?php foreach ($vehiculos as $vehiculo): ?>
                                                     <tr>
                                                         <td><span class="badge bg-light text-body fs-12 fw-medium"><?= esc($vehiculo['placa']) ?></span></td>
+                                                        <?php if (empty($isCliente)): ?>
                                                         <td>
                                                             <div class="d-flex align-items-center">
                                                                 <div class="flex-shrink-0 me-2">
@@ -86,6 +89,7 @@
                                                                 <div class="flex-grow-1"><?= esc($vehiculo['nombre_cliente'] ?? 'Sin asignar') ?></div>
                                                             </div>
                                                         </td>
+                                                        <?php endif; ?>
                                                         <td><?= esc($vehiculo['marca']) ?></td>
                                                         <td><?= esc($vehiculo['modelo']) ?> <small class="text-muted">(<?= esc($vehiculo['tipo_motor']) ?>)</small></td>
                                                         <td><?= esc($vehiculo['anio']) ?></td>

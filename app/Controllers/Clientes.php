@@ -9,8 +9,21 @@ class Clientes extends ResourceController
     protected $modelName = 'App\Models\ClientesModel';
     protected $format = 'html';
 
+    private function requireAdmin()
+    {
+        if (session()->get('rol') !== 'ADMIN') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder a la gestión de clientes.');
+        }
+        return null;
+    }
+
     public function index()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
         $data = [
             'clientes' => $this->model->findAll(),
             'title' => 'Gestión de Clientes'
@@ -61,6 +74,10 @@ class Clientes extends ResourceController
 
     public function edit($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $cliente = $this->model->find($id);
         if (!$cliente) {
             return redirect()->to('/clientes')->with('error', 'Cliente no encontrado');
@@ -75,6 +92,10 @@ class Clientes extends ResourceController
 
     public function update($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $cliente = $this->model->find($id);
         if (!$cliente) {
             return redirect()->to('/clientes')->with('error', 'Cliente no encontrado');

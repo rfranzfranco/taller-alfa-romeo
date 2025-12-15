@@ -9,8 +9,19 @@ class Servicios extends ResourceController
     protected $modelName = 'App\Models\ServiciosModel';
     protected $format = 'html';
 
+    private function requireAdmin()
+    {
+        if (session()->get('rol') !== 'ADMIN') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder al catálogo de servicios.');
+        }
+        return null;
+    }
+
     public function index()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
         $data = [
             'servicios' => $this->model->findAll(),
             'title' => 'Catálogo de Servicios'
@@ -20,6 +31,10 @@ class Servicios extends ResourceController
 
     public function new()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $data = [
             'title' => 'Nuevo Servicio'
         ];
@@ -28,6 +43,10 @@ class Servicios extends ResourceController
 
     public function create()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $rules = [
             'nombre' => 'required|min_length[3]',
             'costo_mano_obra' => 'required|decimal',
@@ -54,6 +73,10 @@ class Servicios extends ResourceController
 
     public function edit($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $servicio = $this->model->find($id);
         if (!$servicio) {
             return redirect()->to('/servicios')->with('error', 'Servicio no encontrado');
@@ -68,6 +91,10 @@ class Servicios extends ResourceController
 
     public function update($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $servicio = $this->model->find($id);
         if (!$servicio) {
             return redirect()->to('/servicios')->with('error', 'Servicio no encontrado');
@@ -99,6 +126,10 @@ class Servicios extends ResourceController
 
     public function delete($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         if ($this->model->delete($id)) {
             return redirect()->to('/servicios')->with('message', 'Servicio eliminado exitosamente');
         }

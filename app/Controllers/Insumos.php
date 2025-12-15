@@ -9,8 +9,20 @@ class Insumos extends ResourceController
     protected $modelName = 'App\Models\InsumosModel';
     protected $format = 'html';
 
+    private function requireAdmin()
+    {
+        if (session()->get('rol') !== 'ADMIN') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder al inventario.');
+        }
+        return null;
+    }
+
     public function index()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $data = [
             'insumos' => $this->model->findAll(),
             'title' => 'Gestión de Inventario'
@@ -20,6 +32,10 @@ class Insumos extends ResourceController
 
     public function new()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $data = [
             'title' => 'Nuevo Insumo'
         ];
@@ -28,6 +44,10 @@ class Insumos extends ResourceController
 
     public function create()
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $rules = [
             'codigo' => 'required|is_unique[insumos.codigo]|min_length[3]',
             'nombre' => 'required|min_length[3]',
@@ -80,6 +100,10 @@ class Insumos extends ResourceController
 
     public function edit($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         $insumo = $this->model->find($id);
         if (!$insumo) {
             return redirect()->to('/insumos')->with('error', 'Insumo no encontrado');
@@ -93,7 +117,9 @@ class Insumos extends ResourceController
     }
 
     public function update($id = null)
-    {
+    {        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
         $insumo = $this->model->find($id);
         if (!$insumo) {
             return redirect()->to('/insumos')->with('error', 'Insumo no encontrado');
@@ -129,6 +155,10 @@ class Insumos extends ResourceController
 
     public function delete($id = null)
     {
+        if ($redirect = $this->requireAdmin()) {
+            return $redirect;
+        }
+
         if ($this->model->delete($id)) {
             return redirect()->to('/insumos')->with('message', 'Insumo eliminado exitosamente');
         }

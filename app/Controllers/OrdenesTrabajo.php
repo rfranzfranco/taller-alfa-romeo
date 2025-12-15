@@ -14,8 +14,20 @@ class OrdenesTrabajo extends ResourceController
     protected $modelName = 'App\Models\OrdenesTrabajoModel';
     protected $format = 'html';
 
+    private function requireStaff()
+    {
+        $role = session()->get('rol');
+        if ($role !== 'ADMIN' && $role !== 'EMPLEADO') {
+            return redirect()->to('/')->with('error', 'No tiene permisos para acceder a órdenes de trabajo.');
+        }
+        return null;
+    }
+
     public function index()
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
         // List reservations that need assignment (Status: PENDIENTE)
         $reservasModel = new ReservasModel();
 
@@ -154,6 +166,10 @@ class OrdenesTrabajo extends ResourceController
 
     public function store()
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $id_reserva = $this->request->getPost('id_reserva');
         $id_empleado = $this->request->getPost('id_empleado');
         $id_rampa = $this->request->getPost('id_rampa'); // Optional
@@ -226,6 +242,10 @@ class OrdenesTrabajo extends ResourceController
 
     public function finalize()
     {
+        if ($redirect = $this->requireStaff()) {
+            return $redirect;
+        }
+
         $id_orden = $this->request->getPost('id_orden');
         $observaciones = $this->request->getPost('observaciones_tecnicas');
         $insumos = $this->request->getPost('insumos'); // Array of IDs

@@ -539,6 +539,7 @@
                                 <a href="/reservas/new" class="quick-action-btn">
                                     <i class="ri-add-circle-line"></i> Nueva Reserva
                                 </a>
+                                <?php if ($rol !== 'CLIENTE'): ?>
                                 <a href="/vehiculos/recepcion" class="quick-action-btn">
                                     <i class="ri-car-washing-line"></i> Recepción Vehículo
                                 </a>
@@ -548,12 +549,22 @@
                                 <a href="/facturas" class="quick-action-btn">
                                     <i class="ri-file-list-3-line"></i> Ver Facturas
                                 </a>
+                                <?php else: ?>
+                                <a href="/vehiculos" class="quick-action-btn">
+                                    <i class="ri-roadster-line"></i> Mis Vehículos
+                                </a>
+                                <a href="/historial" class="quick-action-btn">
+                                    <i class="ri-history-line"></i> Mi Historial
+                                </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
 
                     <!-- Stats Cards -->
                     <div class="row mb-4">
+                        <?php if ($rol !== 'CLIENTE'): ?>
+                        <!-- Stats para ADMIN y EMPLEADO -->
                         <div class="col-xl-3 col-md-6 animate-card">
                             <div class="card stats-card">
                                 <div class="card-body">
@@ -625,9 +636,67 @@
                                 </div>
                             </div>
                         </div>
+                        <?php else: ?>
+                        <!-- Stats para CLIENTE -->
+                        <div class="col-xl-4 col-md-6 animate-card">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div class="stats-icon bg-info-gradient">
+                                            <i class="ri-roadster-line"></i>
+                                        </div>
+                                        <span class="badge bg-info-subtle text-info">Registrados</span>
+                                    </div>
+                                    <div class="stats-number"><?= $mis_vehiculos ?></div>
+                                    <p class="stats-label mb-3">Mis Vehículos</p>
+                                    <a href="/vehiculos" class="stats-link">
+                                        Ver vehículos <i class="ri-arrow-right-line"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 animate-card">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div class="stats-icon bg-success-gradient">
+                                            <i class="ri-calendar-check-line"></i>
+                                        </div>
+                                        <span class="badge bg-success-subtle text-success">Total</span>
+                                    </div>
+                                    <div class="stats-number"><?= $mis_reservas ?></div>
+                                    <p class="stats-label mb-3">Mis Reservas</p>
+                                    <a href="/reservas" class="stats-link">
+                                        Ver reservas <i class="ri-arrow-right-line"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6 animate-card">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div class="stats-icon bg-primary-gradient">
+                                            <i class="ri-history-line"></i>
+                                        </div>
+                                        <span class="badge bg-primary-subtle text-primary">Historial</span>
+                                    </div>
+                                    <div class="stats-number"><?= $mis_servicios ?></div>
+                                    <p class="stats-label mb-3">Servicios Realizados</p>
+                                    <a href="/historial" class="stats-link">
+                                        Ver historial <i class="ri-arrow-right-line"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Data Tables Row -->
+                    <?php if ($rol !== 'CLIENTE'): ?>
+                    <!-- Tablas para ADMIN y EMPLEADO -->
                     <div class="row">
                         <div class="col-xl-6 mb-4">
                             <div class="card data-card">
@@ -740,6 +809,104 @@
                             </div>
                         </div>
                     </div>
+                    <?php else: ?>
+                    <!-- Tablas para CLIENTE -->
+                    <div class="row">
+                        <div class="col-xl-6 mb-4">
+                            <div class="card data-card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <i class="ri-calendar-event-line"></i> Mis Reservas Recientes
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    <?php if (!empty($cliente_reservas)): ?>
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Fecha</th>
+                                                        <th>Vehículo</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($cliente_reservas as $reserva): ?>
+                                                        <tr>
+                                                            <td>
+                                                                <span class="fw-medium"><?= date('d/m/Y', strtotime($reserva['fecha_reserva'])) ?></span>
+                                                                <br>
+                                                                <small class="text-muted"><?= date('H:i', strtotime($reserva['fecha_reserva'])) ?></small>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge bg-light text-dark"><?= esc($reserva['placa']) ?></span>
+                                                                <br>
+                                                                <small class="text-muted"><?= esc($reserva['marca'] . ' ' . $reserva['modelo']) ?></small>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge-status status-<?= strtolower($reserva['estado']) == 'pendiente' ? 'pending' : (strtolower($reserva['estado']) == 'confirmada' ? 'confirmed' : 'progress') ?>">
+                                                                    <?= esc($reserva['estado']) ?>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="empty-state">
+                                            <i class="ri-calendar-line"></i>
+                                            <p class="mb-0">No tienes reservas registradas</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-6 mb-4">
+                            <div class="card data-card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <i class="ri-roadster-line"></i> Mis Vehículos
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    <?php if (!empty($cliente_vehiculos)): ?>
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Placa</th>
+                                                        <th>Vehículo</th>
+                                                        <th>Año</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($cliente_vehiculos as $vehiculo): ?>
+                                                        <tr>
+                                                            <td><span class="badge bg-light text-dark"><?= esc($vehiculo['placa']) ?></span></td>
+                                                            <td>
+                                                                <span class="fw-medium"><?= esc($vehiculo['marca']) ?></span>
+                                                                <br>
+                                                                <small class="text-muted"><?= esc($vehiculo['modelo']) ?></small>
+                                                            </td>
+                                                            <td><?= esc($vehiculo['anio']) ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="empty-state">
+                                            <i class="ri-roadster-line"></i>
+                                            <p class="mb-0">No tienes vehículos registrados</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
                 </div>
                 <!-- container-fluid -->

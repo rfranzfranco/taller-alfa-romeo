@@ -14,31 +14,66 @@ class Home extends BaseController
 		$ordenesModel = new \App\Models\OrdenesTrabajoModel();
 		$vehiculosModel = new \App\Models\VehiculosModel();
 		$facturasModel = new \App\Models\FacturasModel();
+		$clientesModel = new \App\Models\ClientesModel();
 
-		// Stats
-		$activeOrdersKey = 'ordenes_activas';
-		$todayReservationsKey = 'reservas_hoy';
+		$rol = session()->get('rol');
+		$data = ['rol' => $rol];
 
-		$data = [
-			'ordenes_activas' => $ordenesModel->where('estado', 'EN_PROCESO')->countAllResults(),
-			'reservas_hoy' => $reservasModel->where('fecha_reserva >=', date('Y-m-d 00:00:00'))->where('fecha_reserva <=', date('Y-m-d 23:59:59'))->countAllResults(),
-			'total_vehiculos' => $vehiculosModel->countAllResults(),
-			'facturas_pendientes' => $facturasModel->where('estado_pago', 'PENDIENTE')->countAllResults(),
-			// Lists
-			'latest_reservas' => $reservasModel->select('reservas.*, clientes.nombre_completo as cliente_nombre, vehiculos.placa')
+		if ($rol === 'CLIENTE') {
+			// Obtener el id_cliente del usuario logueado
+			$idUsuario = session()->get('id_usuario');
+			$cliente = $clientesModel->where('id_usuario', $idUsuario)->first();
+			$idCliente = $cliente ? $cliente['id_cliente'] : 0;
+
+			// Stats específicos para CLIENTE
+			$data['mis_vehiculos'] = $vehiculosModel->where('id_cliente', $idCliente)->countAllResults();
+			$data['mis_reservas'] = $reservasModel->where('id_cliente', $idCliente)->countAllResults();
+			
+			// Contar servicios finalizados del cliente
+			$data['mis_servicios'] = $ordenesModel
+				->join('reservas', 'reservas.id_reserva = ordenes_trabajo.id_reserva')
+				->where('reservas.id_cliente', $idCliente)
+				->where('ordenes_trabajo.estado', 'FINALIZADA')
+				->countAllResults();
+
+			// Últimas reservas del cliente
+			$data['cliente_reservas'] = $reservasModel->select('reservas.*, vehiculos.placa, vehiculos.marca, vehiculos.modelo')
+				->join('vehiculos', 'vehiculos.id_vehiculo = reservas.id_vehiculo')
+				->where('reservas.id_cliente', $idCliente)
+				->orderBy('fecha_reserva', 'DESC')
+				->limit(5)
+				->findAll();
+
+			// Vehículos del cliente
+			$data['cliente_vehiculos'] = $vehiculosModel->where('id_cliente', $idCliente)->findAll();
+
+		} else {
+			// Stats para ADMIN y EMPLEADO
+			$data['ordenes_activas'] = $ordenesModel->where('estado', 'EN_PROCESO')->countAllResults();
+			$data['reservas_hoy'] = $reservasModel
+				->where('DATE(fecha_reserva)', date('Y-m-d'))
+				->whereNotIn('estado', ['FINALIZADA', 'CANCELADA'])
+				->countAllResults();
+			$data['total_vehiculos'] = $vehiculosModel->countAllResults();
+			$data['facturas_pendientes'] = $facturasModel->where('estado_pago', 'PENDIENTE')->countAllResults();
+
+			// Lists para ADMIN y EMPLEADO
+			$data['latest_reservas'] = $reservasModel->select('reservas.*, clientes.nombre_completo as cliente_nombre, vehiculos.placa')
 				->join('clientes', 'clientes.id_cliente = reservas.id_cliente')
 				->join('vehiculos', 'vehiculos.id_vehiculo = reservas.id_vehiculo')
 				->where('fecha_reserva >=', date('Y-m-d'))
+				->whereNotIn('reservas.estado', ['FINALIZADA', 'CANCELADA'])
 				->orderBy('fecha_reserva', 'ASC')
 				->limit(5)
-				->findAll(),
-			'active_ordenes' => $ordenesModel->select('ordenes_trabajo.*, vehiculos.placa, empleados.nombre_completo as mecanico_nombre')
+				->findAll();
+
+			$data['active_ordenes'] = $ordenesModel->select('ordenes_trabajo.*, vehiculos.placa, empleados.nombre_completo as mecanico_nombre')
 				->join('reservas', 'reservas.id_reserva = ordenes_trabajo.id_reserva')
 				->join('vehiculos', 'vehiculos.id_vehiculo = reservas.id_vehiculo')
 				->join('empleados', 'empleados.id_empleado = ordenes_trabajo.id_empleado_asignado', 'left')
 				->where('ordenes_trabajo.estado', 'EN_PROCESO')
-				->findAll()
-		];
+				->findAll();
+		}
 
 		return view('index', $data);
 	}

@@ -76,6 +76,7 @@
                                     <form action="/vehiculos" method="post">
                                         <?= csrf_field() ?>
                                         <div class="row g-3">
+                                            <?php if (empty($isCliente)): ?>
                                             <div class="col-lg-12">
                                                 <div class="mb-3">
                                                     <label for="id_cliente" class="form-label">Propietario
@@ -93,6 +94,9 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <?php else: ?>
+                                            <input type="hidden" name="id_cliente" value="<?= $clienteId ?>">
+                                            <?php endif; ?>
 
                                             <div class="col-lg-4">
                                                 <div class="form-floating">
