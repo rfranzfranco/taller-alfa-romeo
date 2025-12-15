@@ -28,13 +28,13 @@
                         <li class="nav-item">
                             <a class="nav-link active" data-bs-toggle="tab" href="#pendientes" role="tab">
                                 Pendientes de Asignación <span
-                                    class="badge badge-soft-danger align-middle ms-1"><?= count($pendientes) ?></span>
+                                    class="badge bg-danger rounded-pill ms-1"><?= count($pendientes) ?></span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#proceso" role="tab">
                                 Órdenes en Proceso <span
-                                    class="badge badge-soft-primary align-middle ms-1"><?= count($enProceso) ?></span>
+                                    class="badge bg-primary rounded-pill ms-1"><?= count($enProceso) ?></span>
                             </a>
                         </li>
                     </ul>

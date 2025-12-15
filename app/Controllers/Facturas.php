@@ -24,7 +24,24 @@ class Facturas extends ResourceController
         if ($redirect = $this->requireStaff()) {
             return $redirect;
         }
-        return $this->respond($this->model->findAll());
+
+        $db = \Config\Database::connect();
+        
+        // Obtener todas las facturas con información relacionada
+        $facturas = $this->model->select('facturas.*, ordenes_trabajo.id_reserva, vehiculos.placa, vehiculos.marca, vehiculos.modelo, clientes.nombre_completo as cliente_nombre')
+            ->join('ordenes_trabajo', 'ordenes_trabajo.id_orden = facturas.id_orden')
+            ->join('reservas', 'reservas.id_reserva = ordenes_trabajo.id_reserva')
+            ->join('vehiculos', 'vehiculos.id_vehiculo = reservas.id_vehiculo')
+            ->join('clientes', 'clientes.id_cliente = reservas.id_cliente')
+            ->orderBy('facturas.fecha_emision', 'DESC')
+            ->findAll();
+
+        $data = [
+            'title' => 'Facturación',
+            'facturas' => $facturas
+        ];
+
+        return view('facturas/index', $data);
     }
 
     public function show($id = null)
