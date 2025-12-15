@@ -91,8 +91,21 @@
                                                                 <i class="ri-more-fill align-middle"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                                <!-- RF-13: Cancel if pending -->
-                                                                <?php if($reserva['estado'] == 'PENDIENTE'): ?>
+                                                                <?php 
+                                                                // Calcular si faltan más de 2 horas para la reserva
+                                                                $fechaReserva = strtotime($reserva['fecha_reserva']);
+                                                                $ahora = time();
+                                                                $diferenciaHoras = ($fechaReserva - $ahora) / 3600;
+                                                                $puedeModificar = ($reserva['estado'] == 'PENDIENTE' && $diferenciaHoras >= 2);
+                                                                ?>
+                                                                
+                                                                <!-- RF-13: Modificar reserva (solo cliente dueño, 2h antes) -->
+                                                                <?php if ($puedeModificar): ?>
+                                                                <li>
+                                                                    <a href="/reservas/edit/<?= $reserva['id_reserva'] ?>" class="dropdown-item edit-item-btn">
+                                                                        <i class="ri-pencil-fill align-bottom me-2 text-primary"></i> Modificar
+                                                                    </a>
+                                                                </li>
                                                                 <li>
                                                                     <form action="/reservas/cancel/<?= $reserva['id_reserva'] ?>" method="post" style="display:inline;">
                                                                         <?= csrf_field() ?>
@@ -101,14 +114,28 @@
                                                                         </button>
                                                                     </form>
                                                                 </li>
+                                                                <?php elseif ($reserva['estado'] == 'PENDIENTE' && $diferenciaHoras < 2 && $diferenciaHoras > 0): ?>
+                                                                <li>
+                                                                    <span class="dropdown-item text-muted">
+                                                                        <i class="ri-time-line align-bottom me-2"></i> Menos de 2h para la cita
+                                                                    </span>
+                                                                </li>
                                                                 <?php endif; ?>
                                                                 
                                                                 <?php if (session()->get('rol') !== 'CLIENTE' && $reserva['estado'] == 'PENDIENTE'): ?>
                                                                     <li>
-                                                                        <a href="#" class="dropdown-item" onclick="alert('Funcionalidad de Asignación en Desarrollo (RF-05)')">
-                                                                            <i class="ri-user-settings-line align-bottom me-2 text-muted"></i> Asignar
+                                                                        <a href="/ordenestrabajo/assign/<?= $reserva['id_reserva'] ?>" class="dropdown-item">
+                                                                            <i class="ri-user-settings-line align-bottom me-2 text-muted"></i> Asignar Técnico
                                                                         </a>
                                                                     </li>
+                                                                <?php endif; ?>
+                                                                
+                                                                <?php if ($reserva['estado'] == 'CANCELADA' || $reserva['estado'] == 'TERMINADO'): ?>
+                                                                <li>
+                                                                    <span class="dropdown-item text-muted">
+                                                                        <i class="ri-information-line align-bottom me-2"></i> Sin acciones disponibles
+                                                                    </span>
+                                                                </li>
                                                                 <?php endif; ?>
                                                             </ul>
                                                         </div>
@@ -142,7 +169,25 @@
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#reservasData').DataTable();
+            $('#reservasData').DataTable({
+                language: {
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_",
+                    infoEmpty: "Sin registros",
+                    infoFiltered: "(filtrado de _MAX_)",
+                    loadingRecords: "Cargando...",
+                    zeroRecords: "No se encontraron registros",
+                    emptyTable: "No hay datos disponibles",
+                    paginate: {
+                        first: "Primero",
+                        previous: "Anterior",
+                        next: "Siguiente",
+                        last: "Último"
+                    }
+                }
+            });
         });
     </script>
     <script src="/assets/js/app.js"></script>

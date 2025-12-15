@@ -130,8 +130,25 @@
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#pendientesTable').DataTable();
-            $('#procesoTable').DataTable();
+            var spanishLanguage = {
+                processing: "Procesando...",
+                search: "Buscar:",
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_",
+                infoEmpty: "Sin registros",
+                infoFiltered: "(filtrado de _MAX_)",
+                loadingRecords: "Cargando...",
+                zeroRecords: "No se encontraron registros",
+                emptyTable: "No hay datos disponibles",
+                paginate: {
+                    first: "Primero",
+                    previous: "Anterior",
+                    next: "Siguiente",
+                    last: "Último"
+                }
+            };
+            $('#pendientesTable').DataTable({ language: spanishLanguage });
+            $('#procesoTable').DataTable({ language: spanishLanguage });
         });
     </script>
     <script src="/assets/js/app.js"></script>

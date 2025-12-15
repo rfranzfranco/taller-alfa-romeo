@@ -52,6 +52,9 @@ $routes->post('vehiculos/recepcion/store', 'Recepcion::store');
 
 // RF-13: Cancel Reservation
 $routes->post('reservas/cancel/(:num)', 'Reservas::cancel/$1');
+$routes->get('reservas/edit/(:num)', 'Reservas::edit/$1');
+$routes->post('reservas/update/(:num)', 'Reservas::update/$1');
+$routes->get('reservas/canModify/(:num)', 'Reservas::canModify/$1');
 
 // RF-05 & RF-06: Work Orders Assignment and Completion
 $routes->get('ordenestrabajo/assign/(:num)', 'OrdenesTrabajo::assign/$1');

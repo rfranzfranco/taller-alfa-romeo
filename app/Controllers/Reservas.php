@@ -168,16 +168,194 @@ class Reservas extends ResourceController
             return redirect()->to('/reservas')->with('error', 'Reserva no encontrada');
         }
 
+        // Verificar que el cliente sea el dueño de la reserva
+        $userId = session()->get('id_usuario');
+        $role = session()->get('rol');
+        
+        if ($role === 'CLIENTE') {
+            $clientesModel = new ClientesModel();
+            $cliente = $clientesModel->where('id_usuario', $userId)->first();
+            
+            if (!$cliente || $cliente['id_cliente'] != $reserva['id_cliente']) {
+                return redirect()->to('/reservas')->with('error', 'No tiene permiso para cancelar esta reserva.');
+            }
+        }
+
         $fechaReserva = strtotime($reserva['fecha_reserva']);
         $ahora = time();
         $diferenciaHoras = ($fechaReserva - $ahora) / 3600;
 
-        // Allow Admin to cancel anytime? For now apply rule to all.
+        // Validar que falten más de 2 horas para la reserva
         if ($diferenciaHoras < 2) {
             return redirect()->to('/reservas')->with('error', 'No se puede cancelar con menos de 2 horas de antelación.');
         }
 
         $this->model->update($id, ['estado' => 'CANCELADA']);
         return redirect()->to('/reservas')->with('message', 'Reserva cancelada exitosamente');
+    }
+
+    // RF-13: Editar/Reprogramar reserva
+    public function edit($id = null)
+    {
+        $reserva = $this->model->find($id);
+        if (!$reserva) {
+            return redirect()->to('/reservas')->with('error', 'Reserva no encontrada');
+        }
+
+        // Verificar que el cliente sea el dueño de la reserva
+        $userId = session()->get('id_usuario');
+        $role = session()->get('rol');
+        
+        if ($role === 'CLIENTE') {
+            $clientesModel = new ClientesModel();
+            $cliente = $clientesModel->where('id_usuario', $userId)->first();
+            
+            if (!$cliente || $cliente['id_cliente'] != $reserva['id_cliente']) {
+                return redirect()->to('/reservas')->with('error', 'No tiene permiso para modificar esta reserva.');
+            }
+        }
+
+        // Verificar que la reserva esté pendiente
+        if ($reserva['estado'] !== 'PENDIENTE') {
+            return redirect()->to('/reservas')->with('error', 'Solo se pueden modificar reservas pendientes.');
+        }
+
+        // Verificar que falten más de 2 horas
+        $fechaReserva = strtotime($reserva['fecha_reserva']);
+        $ahora = time();
+        $diferenciaHoras = ($fechaReserva - $ahora) / 3600;
+
+        if ($diferenciaHoras < 2) {
+            return redirect()->to('/reservas')->with('error', 'No se puede modificar con menos de 2 horas de antelación.');
+        }
+
+        $vehiculosModel = new VehiculosModel();
+        $serviciosModel = new ServiciosModel();
+        $detalleModel = new DetalleReservaModel();
+
+        // Obtener servicios seleccionados
+        $serviciosSeleccionados = $detalleModel->where('id_reserva', $id)->findAll();
+        $serviciosIds = array_column($serviciosSeleccionados, 'id_servicio');
+
+        // Obtener vehículos del cliente
+        $vehiculos = $vehiculosModel->where('id_cliente', $reserva['id_cliente'])->findAll();
+
+        $data = [
+            'reserva' => $reserva,
+            'vehiculos' => $vehiculos,
+            'servicios' => $serviciosModel->findAll(),
+            'serviciosSeleccionados' => $serviciosIds,
+            'title' => 'Modificar Reserva'
+        ];
+
+        return view('reservas/edit', $data);
+    }
+
+    // RF-13: Actualizar reserva
+    public function update($id = null)
+    {
+        $reserva = $this->model->find($id);
+        if (!$reserva) {
+            return redirect()->to('/reservas')->with('error', 'Reserva no encontrada');
+        }
+
+        // Verificar que el cliente sea el dueño de la reserva
+        $userId = session()->get('id_usuario');
+        $role = session()->get('rol');
+        
+        if ($role === 'CLIENTE') {
+            $clientesModel = new ClientesModel();
+            $cliente = $clientesModel->where('id_usuario', $userId)->first();
+            
+            if (!$cliente || $cliente['id_cliente'] != $reserva['id_cliente']) {
+                return redirect()->to('/reservas')->with('error', 'No tiene permiso para modificar esta reserva.');
+            }
+        }
+
+        // Verificar que la reserva esté pendiente
+        if ($reserva['estado'] !== 'PENDIENTE') {
+            return redirect()->to('/reservas')->with('error', 'Solo se pueden modificar reservas pendientes.');
+        }
+
+        // Verificar que falten más de 2 horas (de la fecha original)
+        $fechaReserva = strtotime($reserva['fecha_reserva']);
+        $ahora = time();
+        $diferenciaHoras = ($fechaReserva - $ahora) / 3600;
+
+        if ($diferenciaHoras < 2) {
+            return redirect()->to('/reservas')->with('error', 'No se puede modificar con menos de 2 horas de antelación.');
+        }
+
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+            // Actualizar reserva
+            $reservaData = [
+                'id_vehiculo' => $this->request->getPost('id_vehiculo'),
+                'fecha_reserva' => $this->request->getPost('fecha_reserva')
+            ];
+
+            $this->model->update($id, $reservaData);
+
+            // Actualizar servicios - eliminar anteriores y agregar nuevos
+            $detalleModel = new DetalleReservaModel();
+            $serviciosModel = new ServiciosModel();
+
+            // Eliminar servicios anteriores
+            $detalleModel->where('id_reserva', $id)->delete();
+
+            // Agregar nuevos servicios
+            $servicios = $this->request->getPost('servicios');
+            if (!empty($servicios)) {
+                foreach ($servicios as $servicioId) {
+                    $serviceInfo = $serviciosModel->find($servicioId);
+                    $detalleData = [
+                        'id_reserva' => $id,
+                        'id_servicio' => $servicioId,
+                        'precio_unitario_momento' => $serviceInfo['costo_mano_obra']
+                    ];
+                    $detalleModel->insert($detalleData);
+                }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === FALSE) {
+                return redirect()->back()->withInput()->with('error', 'Error al actualizar la reserva.');
+            }
+
+            return redirect()->to('/reservas')->with('message', 'Reserva modificada exitosamente');
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    // Helper: Verificar si una reserva puede ser modificada/cancelada
+    public function canModify($id = null)
+    {
+        $reserva = $this->model->find($id);
+        if (!$reserva || $reserva['estado'] !== 'PENDIENTE') {
+            return $this->response->setJSON(['canModify' => false, 'reason' => 'Reserva no disponible']);
+        }
+
+        $fechaReserva = strtotime($reserva['fecha_reserva']);
+        $ahora = time();
+        $diferenciaHoras = ($fechaReserva - $ahora) / 3600;
+
+        if ($diferenciaHoras < 2) {
+            return $this->response->setJSON([
+                'canModify' => false, 
+                'reason' => 'Menos de 2 horas para la cita',
+                'horasRestantes' => round($diferenciaHoras, 1)
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'canModify' => true,
+            'horasRestantes' => round($diferenciaHoras, 1)
+        ]);
     }
 }

@@ -29,7 +29,12 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Nueva Reserva</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Modificar Reserva</h4>
+                                    <div class="flex-shrink-0">
+                                        <span class="badge bg-warning-subtle text-warning fs-12">
+                                            Reserva #<?= $reserva['id_reserva'] ?>
+                                        </span>
+                                    </div>
                                 </div>
                                 <div class="card-body">
 
@@ -41,7 +46,13 @@
                                         </div>
                                     <?php endif; ?>
 
-                                    <form action="/reservas/create" method="post">
+                                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                        <i class="ri-information-line me-2"></i>
+                                        <strong>Nota:</strong> Puede modificar la fecha, hora, vehículo y servicios de su reserva hasta 2 horas antes de la cita programada.
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+
+                                    <form action="/reservas/update/<?= $reserva['id_reserva'] ?>" method="post">
                                         <?= csrf_field() ?>
 
                                         <div class="row">
@@ -52,27 +63,23 @@
                                                     required>
                                                     <option value="">Seleccione su vehículo</option>
                                                     <?php foreach ($vehiculos as $vehiculo): ?>
-                                                        <option value="<?= $vehiculo['id_vehiculo'] ?>">
+                                                        <option value="<?= $vehiculo['id_vehiculo'] ?>" 
+                                                            <?= $vehiculo['id_vehiculo'] == $reserva['id_vehiculo'] ? 'selected' : '' ?>>
                                                             <?= $vehiculo['placa'] ?> - <?= $vehiculo['marca'] ?>
                                                             <?= $vehiculo['modelo'] ?>
-                                                            <?php if (isset($vehiculo['owner_name']))
-                                                                echo " (" . $vehiculo['owner_name'] . ")"; ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
-                                                <?php if (empty($vehiculos)): ?>
-                                                    <div class="form-text text-danger">No se encontraron vehículos. Registre
-                                                        uno primero.</div>
-                                                <?php endif; ?>
                                             </div>
 
                                             <div class="col-md-6 mb-3">
-                                                <label for="fecha_reserva" class="form-label">Fecha y Hora <span
+                                                <label for="fecha_reserva" class="form-label">Nueva Fecha y Hora <span
                                                         class="text-danger">*</span></label>
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="ri-calendar-line"></i></span>
                                                     <input type="text" class="form-control"
                                                         id="fecha_reserva" name="fecha_reserva"
+                                                        value="<?= $reserva['fecha_reserva'] ?>"
                                                         placeholder="Seleccione fecha y hora" readonly required>
                                                 </div>
                                                 <small class="text-muted">Horario de atención: Lun-Sáb 08:00 - 18:00</small>
@@ -89,7 +96,8 @@
                                                                 <input class="form-check-input" type="checkbox"
                                                                     name="servicios[]"
                                                                     id="servicio_<?= $servicio['id_servicio'] ?>"
-                                                                    value="<?= $servicio['id_servicio'] ?>">
+                                                                    value="<?= $servicio['id_servicio'] ?>"
+                                                                    <?= in_array($servicio['id_servicio'], $serviciosSeleccionados) ? 'checked' : '' ?>>
                                                                 <label class="form-check-label"
                                                                     for="servicio_<?= $servicio['id_servicio'] ?>">
                                                                     <div class="d-flex align-items-center">
@@ -117,22 +125,12 @@
                                             </div>
                                         </div>
 
-                                        <!-- RF-03 allows supplying inputs selection. For MVP, we stick to Services. Inputs are usually decided by Mechanic or detailed selection. -->
-                                        <!-- If "si aplica, selección de insumos", we could add a text area for "Preferencias de Insumos (Aceite, Filtro)" -->
-                                        <div class="row mt-3">
-                                            <div class="col-12">
-                                                <label for="observaciones" class="form-label">Preferencias de Insumos
-                                                    (Opcional)</label>
-                                                <textarea class="form-control" id="observaciones" name="observaciones"
-                                                    rows="2"
-                                                    placeholder="Ej: Aceite sintético Mobil 1, Filtro original..."></textarea>
-                                            </div>
-                                        </div>
-
                                         <div class="text-end mt-4">
                                             <a href="/reservas" class="btn btn-light">Cancelar</a>
-                                            <button type="submit" class="btn btn-primary"
-                                                onclick="return validateServices()">Confirmar Reserva</button>
+                                            <button type="submit" class="btn btn-success"
+                                                onclick="return validateServices()">
+                                                <i class="ri-save-line me-1"></i> Guardar Cambios
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
@@ -161,6 +159,7 @@
             locale: "es",
             enableTime: true,
             dateFormat: "Y-m-d H:i",
+            defaultDate: "<?= $reserva['fecha_reserva'] ?>",
             minDate: "today",
             minTime: "08:00",
             maxTime: "18:00",
