@@ -79,9 +79,11 @@ Este comando insertará:
 - **Ayudantes Mecánicos:** `ayudante_mec1`, `ayudante_mec2`, `ayudante_mec3` / `ayudante123`
 - **Encargados de Lavado:** `encargado_lavado1`, `encargado_lavado2`, `encargado_lavado3` / `lavado123`
 - **Ayudantes de Lavado:** `ayudante_lavado1`, `ayudante_lavado2` / `ayudante123`
+- **Clientes:** `maria_garcia`, `carlos_mendoza`, `ana_rodriguez` / `cliente123`
 - 8 servicios predefinidos (mecánica + lavado y limpieza)
 - 9 insumos con stock inicial
 - 3 rampas
+- 3 clientes con 4 vehículos
 
 ### Paso 6: Iniciar el Servidor de Desarrollo
 ```bash
@@ -121,6 +123,9 @@ El sistema estará disponible en: **http://localhost:8080**
 | encargado_lavado3 | lavado123 | EMPLEADO | Lavado y Limpieza - Rampa 3 |
 | ayudante_lavado1 | ayudante123 | EMPLEADO | Lavado y Limpieza (Recepción/Aspirado) |
 | ayudante_lavado2 | ayudante123 | EMPLEADO | Lavado y Limpieza (Recepción/Aspirado) |
+| maria_garcia | cliente123 | CLIENTE | Toyota Corolla (1234-ABC) |
+| carlos_mendoza | cliente123 | CLIENTE | Nissan Sentra (5678-DEF) |
+| ana_rodriguez | cliente123 | CLIENTE | Hyundai Tucson, Suzuki Swift |
 
 **⚠️ Importante:** Cambia las contraseñas en producción.
 

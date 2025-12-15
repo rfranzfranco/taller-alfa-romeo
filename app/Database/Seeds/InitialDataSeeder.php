@@ -368,6 +368,111 @@ class InitialDataSeeder extends Seeder
 
         $this->db->table('rampas')->insertBatch($rampas);
 
+        // =============================================
+        // 8. CLIENTES DE EJEMPLO
+        // =============================================
+        
+        // Cliente 1 - María García
+        $this->db->table('usuarios')->insert([
+            'username' => 'maria_garcia',
+            'password' => password_hash('cliente123', PASSWORD_DEFAULT),
+            'rol' => 'CLIENTE',
+            'estado' => 1,
+        ]);
+        $idUsuarioCliente1 = $this->db->insertID();
+
+        $this->db->table('clientes')->insert([
+            'id_usuario' => $idUsuarioCliente1,
+            'nombre_completo' => 'María García Flores',
+            'ci_nit' => '4532167',
+            'telefono' => '72512345',
+            'correo' => 'maria.garcia@gmail.com',
+            'direccion' => 'Calle Bolívar #456, Oruro',
+        ]);
+        $idCliente1 = $this->db->insertID();
+
+        // Vehículo del Cliente 1
+        $this->db->table('vehiculos')->insert([
+            'id_cliente' => $idCliente1,
+            'placa' => '1234-ABC',
+            'marca' => 'Toyota',
+            'modelo' => 'Corolla',
+            'anio' => 2020,
+            'tipo_motor' => 'Gasolina 1.8L',
+            'color' => 'Blanco',
+        ]);
+
+        // Cliente 2 - Carlos Mendoza
+        $this->db->table('usuarios')->insert([
+            'username' => 'carlos_mendoza',
+            'password' => password_hash('cliente123', PASSWORD_DEFAULT),
+            'rol' => 'CLIENTE',
+            'estado' => 1,
+        ]);
+        $idUsuarioCliente2 = $this->db->insertID();
+
+        $this->db->table('clientes')->insert([
+            'id_usuario' => $idUsuarioCliente2,
+            'nombre_completo' => 'Carlos Mendoza Quispe',
+            'ci_nit' => '6789234',
+            'telefono' => '71598765',
+            'correo' => 'carlos.mendoza@hotmail.com',
+            'direccion' => 'Av. 6 de Octubre #789, Oruro',
+        ]);
+        $idCliente2 = $this->db->insertID();
+
+        // Vehículo del Cliente 2
+        $this->db->table('vehiculos')->insert([
+            'id_cliente' => $idCliente2,
+            'placa' => '5678-DEF',
+            'marca' => 'Nissan',
+            'modelo' => 'Sentra',
+            'anio' => 2018,
+            'tipo_motor' => 'Gasolina 1.6L',
+            'color' => 'Gris',
+        ]);
+
+        // Cliente 3 - Ana Rodríguez
+        $this->db->table('usuarios')->insert([
+            'username' => 'ana_rodriguez',
+            'password' => password_hash('cliente123', PASSWORD_DEFAULT),
+            'rol' => 'CLIENTE',
+            'estado' => 1,
+        ]);
+        $idUsuarioCliente3 = $this->db->insertID();
+
+        $this->db->table('clientes')->insert([
+            'id_usuario' => $idUsuarioCliente3,
+            'nombre_completo' => 'Ana Rodríguez Mamani',
+            'ci_nit' => '3456789',
+            'telefono' => '67834521',
+            'correo' => 'ana.rodriguez@gmail.com',
+            'direccion' => 'Calle Junín #234, Oruro',
+        ]);
+        $idCliente3 = $this->db->insertID();
+
+        // Vehículo 1 del Cliente 3
+        $this->db->table('vehiculos')->insert([
+            'id_cliente' => $idCliente3,
+            'placa' => '9012-GHI',
+            'marca' => 'Hyundai',
+            'modelo' => 'Tucson',
+            'anio' => 2022,
+            'tipo_motor' => 'Gasolina 2.0L',
+            'color' => 'Rojo',
+        ]);
+
+        // Vehículo 2 del Cliente 3
+        $this->db->table('vehiculos')->insert([
+            'id_cliente' => $idCliente3,
+            'placa' => '3456-JKL',
+            'marca' => 'Suzuki',
+            'modelo' => 'Swift',
+            'anio' => 2019,
+            'tipo_motor' => 'Gasolina 1.2L',
+            'color' => 'Azul',
+        ]);
+
         echo "✅ Datos iniciales insertados correctamente.\n";
         echo "   ADMINISTRACIÓN:\n";
         echo "   - Administrador: admin / admin123\n";
@@ -378,8 +483,11 @@ class InitialDataSeeder extends Seeder
         echo "   ÁREA DE LAVADO Y LIMPIEZA:\n";
         echo "   - Encargados de Lavado: encargado_lavado1, encargado_lavado2, encargado_lavado3 / lavado123\n";
         echo "   - Ayudantes de Lavado: ayudante_lavado1, ayudante_lavado2 / ayudante123\n";
+        echo "   CLIENTES DE EJEMPLO:\n";
+        echo "   - maria_garcia, carlos_mendoza, ana_rodriguez / cliente123\n";
         echo "   - " . count($servicios) . " servicios creados\n";
         echo "   - " . count($insumos) . " insumos creados\n";
         echo "   - " . count($rampas) . " rampas creadas\n";
+        echo "   - 3 clientes con 4 vehículos creados\n";
     }
 }
