@@ -204,7 +204,7 @@
                                                             <tr>
                                                                 <td><span class="fw-medium">#<?= $reserva['id_reserva'] ?></span></td>
                                                                 <td><?= esc($reserva['placa'] ?? '-') ?></td>
-                                                                <td><?= date('d/m/Y H:i', strtotime($reserva['fecha_hora_reserva'])) ?></td>
+                                                                <td><?= date('d/m/Y H:i', strtotime($reserva['fecha_reserva'])) ?></td>
                                                                 <td>
                                                                     <?php 
                                                                     $estadoClass = 'bg-secondary';

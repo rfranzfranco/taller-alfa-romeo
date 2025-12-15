@@ -51,7 +51,7 @@ class Usuarios extends ResourceController
                     ->select('r.*, v.placa')
                     ->join('vehiculos v', 'v.id_vehiculo = r.id_vehiculo', 'left')
                     ->where('r.id_cliente', $cliente['id_cliente'])
-                    ->orderBy('r.fecha_hora_reserva', 'DESC')
+                    ->orderBy('r.fecha_reserva', 'DESC')
                     ->limit(10)
                     ->get()->getResultArray();
             }
