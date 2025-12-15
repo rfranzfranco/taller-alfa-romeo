@@ -386,10 +386,10 @@
         <!-- Header -->
         <div class="invoice-header">
             <div class="company-info">
-                <h1>🔧 TALLER AUTOMOTRIZ</h1>
-                <p>Servicios de Mantenimiento y Reparación</p>
-                <p>Dirección: Av. Principal #123, Ciudad</p>
-                <p>Teléfono: (123) 456-7890 | Email: taller@ejemplo.com</p>
+                <h1>🔧 TALLER "ALFA ROMEO"</h1>
+                <p>Servicios de Mantenimiento y Reparación Automotriz</p>
+                <p>Dirección: Avenida Tacna Final Norte, Oruro - Bolivia</p>
+                <p>Teléfono: (02) 525-1234 | Email: contacto@talleralfaromeo.com</p>
                 <p>NIT: 1234567890</p>
             </div>
             <div class="invoice-title">

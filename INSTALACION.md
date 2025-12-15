@@ -8,7 +8,7 @@
 
 ---
 
-## 🔧 Instalación en Nueva Computadora
+## 🔧 Instalación en una Nueva maquina
 
 ### Paso 1: Clonar o Copiar el Proyecto
 ```bash
@@ -73,11 +73,14 @@ php spark db:seed InitialDataSeeder
 ```
 
 Este comando insertará:
-- **Usuario Admin:** `admin` / `admin123`
-- **Usuario Recepción:** `recepcion` / `recepcion123`
-- **Técnicos:** `tecnico1`, `tecnico2` / `tecnico123`
-- 9 servicios predefinidos
-- 7 insumos con stock inicial
+- **Administrador:** `admin` / `admin123`
+- **Jefe de Taller:** `jefetaller` / `jefetaller123`
+- **Supervisor Mecánico:** `supervisor_mecanico` / `supervisor123`
+- **Ayudantes Mecánicos:** `ayudante_mec1`, `ayudante_mec2`, `ayudante_mec3` / `ayudante123`
+- **Encargados de Lavado:** `encargado_lavado1`, `encargado_lavado2`, `encargado_lavado3` / `lavado123`
+- **Ayudantes de Lavado:** `ayudante_lavado1`, `ayudante_lavado2` / `ayudante123`
+- 8 servicios predefinidos (mecánica + lavado y limpieza)
+- 9 insumos con stock inicial
 - 3 rampas
 
 ### Paso 6: Iniciar el Servidor de Desarrollo
@@ -105,12 +108,19 @@ El sistema estará disponible en: **http://localhost:8080**
 
 ## 🔐 Credenciales por Defecto
 
-| Usuario | Contraseña | Rol |
-|---------|------------|-----|
-| admin | admin123 | ADMIN |
-| recepcion | recepcion123 | RECEPCIONISTA |
-| tecnico1 | tecnico123 | EMPLEADO |
-| tecnico2 | tecnico123 | EMPLEADO |
+| Usuario | Contraseña | Rol | Área |
+|---------|------------|-----|------|
+| admin | admin123 | ADMIN | Administración |
+| jefetaller | jefetaller123 | RECEPCIONISTA | Administración |
+| supervisor_mecanico | supervisor123 | EMPLEADO | Cambio de Aceite y Engrasado |
+| ayudante_mec1 | ayudante123 | EMPLEADO | Cambio de Aceite y Engrasado |
+| ayudante_mec2 | ayudante123 | EMPLEADO | Cambio de Aceite y Engrasado |
+| ayudante_mec3 | ayudante123 | EMPLEADO | Cambio de Aceite y Engrasado |
+| encargado_lavado1 | lavado123 | EMPLEADO | Lavado y Limpieza - Rampa 1 |
+| encargado_lavado2 | lavado123 | EMPLEADO | Lavado y Limpieza - Rampa 2 |
+| encargado_lavado3 | lavado123 | EMPLEADO | Lavado y Limpieza - Rampa 3 |
+| ayudante_lavado1 | ayudante123 | EMPLEADO | Lavado y Limpieza (Recepción/Aspirado) |
+| ayudante_lavado2 | ayudante123 | EMPLEADO | Lavado y Limpieza (Recepción/Aspirado) |
 
 **⚠️ Importante:** Cambia las contraseñas en producción.
 

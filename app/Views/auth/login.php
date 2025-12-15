@@ -220,8 +220,11 @@
                             <div class="car-icon">
                                 <i class="ri-roadster-fill"></i>
                             </div>
-                            <h2>Taller Alfa Romeo</h2>
+                            <h2>Taller "Alfa Romeo"</h2>
                             <p>Sistema de Gestión Integral para el control de servicios, reservas y operaciones del taller mecánico.</p>
+                            <p style="font-size: 12px; opacity: 0.9; margin-top: 10px;">
+                                <i class="ri-map-pin-line"></i> Avenida Tacna Final Norte, Oruro - Bolivia
+                            </p>
                             
                             <ul class="features-list mt-4">
                                 <li><i class="ri-calendar-check-line"></i> Gestión de Reservas y Citas</li>
@@ -307,7 +310,7 @@
             <div class="text-center mt-4">
                 <p class="text-white-50 mb-0" style="font-size: 13px;">
                     &copy; <script>document.write(new Date().getFullYear())</script> 
-                    Taller Mecánico Alfa Romeo - Sistema de Gestión
+                    Taller "Alfa Romeo" - Oruro, Bolivia
                 </p>
             </div>
         </div>
